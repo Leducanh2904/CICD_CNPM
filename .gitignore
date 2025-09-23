@@ -1,0 +1,12 @@
+node_modules
+*.env
+*.vscode
+client/.eslintcache
+
+# Local Netlify folder
+.netlify
+db
+dist
+client/public/sitemap.xml
+.terraform/
+.terraform.lock.hcl

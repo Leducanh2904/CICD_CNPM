@@ -13,8 +13,14 @@ CREATE TABLE IF NOT EXISTS users (
     fullname VARCHAR(150) NOT NULL,     
     email VARCHAR(150) UNIQUE NOT NULL,
     password VARCHAR(200) NOT NULL,
+    roles VARCHAR(50) DEFAULT 'user',       
+    address VARCHAR(255),
+    city VARCHAR(100),                      
+    state VARCHAR(100),                   
+    country VARCHAR(100),                  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- =========================
 -- Products

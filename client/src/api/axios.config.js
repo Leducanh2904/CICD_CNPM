@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const baseURL = import.meta.env.PROD ? import.meta.env.VITE_API_URL : "http://localhost:9000/api";
+const baseURL = import.meta.env.PROD
+  ? import.meta.env.VITE_API_URL
+  : "http://localhost:9000/api";
 
 const API = axios.create({
   baseURL,
@@ -9,8 +11,13 @@ const API = axios.create({
 
 API.interceptors.request.use(
   function (req) {
-    const token = JSON.parse(localStorage.getItem("token"));
-    if (token) req.headers["auth-token"] = token;
+    const token = localStorage.getItem("token"); // chuỗi JWT
+    if (token) {
+      req.headers["auth-token"] = token;
+      console.log("🔑 Attached token:", token);
+    } else {
+      console.warn("⚠️ No token found in localStorage");
+    }
     return req;
   },
   function (error) {

@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const verifyToken = require("../middleware/verifyToken");
+const verifyToken = require("../middleware/verifyToken");  // Đảm bảo middleware set req.user = { id: ... }
 const {
   getCart,
   addItem,
@@ -9,19 +9,11 @@ const {
 } = require("../controllers/cart.controller");
 
 router.use(verifyToken);
-// get cart items
+
 router.route("/").get(getCart);
-
-// add item to cart
-router.route("/add").post(addItem);
-
-// delete item from cart
-router.route("/delete").delete(deleteItem);
-
-// increment item quantity
-router.route("/increment").put(increaseItemQuantity);
-
-// decrement item quantity
-router.route("/decrement").put(decreaseItemQuantity);
+router.route("/add").post(addItem);  // Body: { product_id, quantity }
+router.route("/delete").delete(deleteItem);  // Body: { product_id }
+router.route("/increment").put(increaseItemQuantity);  // Body: { product_id }
+router.route("/decrement").put(decreaseItemQuantity);  // Body: { product_id }
 
 module.exports = router;

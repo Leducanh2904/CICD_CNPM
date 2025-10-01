@@ -1,3 +1,4 @@
+// services/cart.service.js - FIXED cho schema flat: Truyền user_id trực tiếp vào DB
 const {
   createCartDb,
   getCartDb,
@@ -12,55 +13,80 @@ const { ErrorHandler } = require("../helpers/error");
 class CartService {
   createCart = async (userId) => {
     try {
+      // Không cần explicit create (addItem sẽ tự insert nếu chưa có), nhưng giữ để tương thích
       return await createCartDb(userId);
     } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message);
+      throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
+
   getCart = async (userId) => {
     try {
+      if (!userId) {
+        throw new ErrorHandler(400, 'Thiếu user_id');
+      }
       return await getCartDb(userId);
     } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message);
+      throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
 
   addItem = async (data) => {
     try {
-      return await addItemDb(data);
+      const { user_id, product_id, quantity = 1 } = data;
+      if (!user_id || !product_id) {
+        throw new ErrorHandler(400, 'Thiếu user_id hoặc product_id');
+      }
+      return await addItemDb({ user_id, product_id, quantity });
     } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message);
+      throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
 
   removeItem = async (data) => {
     try {
-      return await deleteItemDb(data);
+      const { user_id, product_id } = data;
+      if (!user_id || !product_id) {
+        throw new ErrorHandler(400, 'Thiếu user_id hoặc product_id');
+      }
+      return await deleteItemDb({ user_id, product_id });
     } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message);
+      throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
 
   increaseQuantity = async (data) => {
     try {
-      return await increaseItemQuantityDb(data);
+      const { user_id, product_id } = data;
+      if (!user_id || !product_id) {
+        throw new ErrorHandler(400, 'Thiếu user_id hoặc product_id');
+      }
+      return await increaseItemQuantityDb({ user_id, product_id });
     } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message);
+      throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
 
   decreaseQuantity = async (data) => {
     try {
-      return await decreaseItemQuantityDb(data);
+      const { user_id, product_id } = data;
+      if (!user_id || !product_id) {
+        throw new ErrorHandler(400, 'Thiếu user_id hoặc product_id');
+      }
+      return await decreaseItemQuantityDb({ user_id, product_id });
     } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message);
+      throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
-  emptyCart = async (cartId) => {
+
+  emptyCart = async (userId) => {  // Thay cartId bằng userId
     try {
-      return await emptyCartDb(cartId);
+      if (!userId) {
+        throw new ErrorHandler(400, 'Thiếu user_id');
+      }
+      return await emptyCartDb(userId);
     } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message);
+      throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
 }

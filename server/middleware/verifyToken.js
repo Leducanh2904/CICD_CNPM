@@ -2,7 +2,9 @@ const jwt = require("jsonwebtoken");
 const { ErrorHandler } = require("../helpers/error");
 
 const verifyToken = (req, res, next) => {
-  const token = req.header("auth-token");
+  const token = req.header("auth-token") || req.header("Authorization");
+  console.log("🔍 Incoming auth-token header:", token);
+
   if (!token) {
     throw new ErrorHandler(401, "Token missing");
   }
@@ -12,7 +14,7 @@ const verifyToken = (req, res, next) => {
     req.user = verified;
     next();
   } catch (error) {
-    throw new ErrorHandler(401, error.message || "Invalid Token");
+    throw new ErrorHandler(401, error.message || "Invalid Token");    
   }
 };
 

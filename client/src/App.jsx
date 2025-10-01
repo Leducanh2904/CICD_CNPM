@@ -49,7 +49,7 @@ function App() {
         <Route path="/signup" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route index element={<ProductList />} />
-        <Route path="/products/:slug/" element={<ProductDetails />} />
+        <Route path="/products/:slug" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 

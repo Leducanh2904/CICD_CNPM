@@ -7,9 +7,7 @@ const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
-  const [authData, setAuthData] = useState({
-    token: "",
-  });
+  const [authData, setAuthData] = useState({ token: "" });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -19,9 +17,10 @@ const UserProvider = ({ children }) => {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    if (localStorage.getItem("token")) {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
       setIsLoggedIn(true);
-      setAuthData(JSON.parse(localStorage.getItem("token")));
+      setAuthData({ token: storedToken }); // ✅ giữ raw string
     }
   }, []);
 
@@ -42,16 +41,16 @@ const UserProvider = ({ children }) => {
     const { user, token } = data;
     setIsLoggedIn(true);
     setUserData(user);
-    setAuthData({
-      token,
-    });
-    localStorage.setItem("token", JSON.stringify(token));
+    setAuthData({ token });
+
+    localStorage.setItem("token", token); // ✅ lưu raw string, không JSON.stringify
   };
 
   const logout = () => {
     setUserData(null);
     setAuthData(null);
     setIsLoggedIn(false);
+    localStorage.removeItem("token");
     authService.logout();
   };
 
@@ -76,7 +75,6 @@ const UserProvider = ({ children }) => {
 
 const useUser = () => {
   const context = useContext(UserContext);
-
   if (context === undefined) {
     throw new Error("useUser must be used within UserProvider");
   }

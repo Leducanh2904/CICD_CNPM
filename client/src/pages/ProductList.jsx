@@ -3,9 +3,11 @@ import Product from "components/Product";
 import Spinner from "components/Spinner";
 import { useProduct } from "context/ProductContext";
 import Layout from "layout/Layout";
+import { useNavigate } from "react-router-dom";  // ✅ THÊM: Để navigate trong Product
 
 const ProductList = () => {
   const { products, setPage } = useProduct();
+  const navigate = useNavigate();  // ✅ THÊM
 
   const handleChange = (page) => {
     setPage(page);
@@ -14,11 +16,9 @@ const ProductList = () => {
 
   if (!products) {
     return (
-      <>
-        <Layout>
-          <Spinner size={100} loading />
-        </Layout>
-      </>
+      <Layout>
+        <Spinner size={100} loading />
+      </Layout>
     );
   }
 
@@ -29,9 +29,12 @@ const ProductList = () => {
           {products?.map((prod) => (
             <div
               className="w-full flex flex-col justify-between sm:w-1/2 md:w-1/3 lg:w-1/4 my-2 px-2 box-border"
-              key={prod.product_id}
+              key={prod.id}
             >
-              <Product product={prod} />
+              {/* ✅ FIX: Bỏ Link, dùng onClick navigate */}
+              <div onClick={() => navigate(`/products/${prod.slug}`)} style={{ cursor: 'pointer' }}>
+                <Product product={prod} />
+              </div>
             </div>
           ))}
         </Card>

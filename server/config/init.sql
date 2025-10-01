@@ -1,3 +1,5 @@
+-- init.sql - UPDATED: Thêm UNIQUE constraint cho cart để fix ON CONFLICT
+
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
 DROP TABLE IF EXISTS cart CASCADE;
@@ -16,11 +18,10 @@ CREATE TABLE IF NOT EXISTS users (
     roles VARCHAR(50) DEFAULT 'user',       
     address VARCHAR(255),
     city VARCHAR(100),                      
-    state VARCHAR(100),                   
+    state VARCHAR(100),                    
     country VARCHAR(100),                  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 
 -- =========================
 -- Products
@@ -28,8 +29,10 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS products (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
     price NUMERIC(12,2) NOT NULL,
     stock INT NOT NULL,
+    description TEXT,
     image_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -41,8 +44,11 @@ CREATE TABLE IF NOT EXISTS cart (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
-    quantity INT DEFAULT 1
+    quantity INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Optional: Để sort items
 );
+
+ALTER TABLE cart ADD CONSTRAINT unique_user_product UNIQUE (user_id, product_id);
 
 -- =========================
 -- Orders
@@ -71,26 +77,16 @@ CREATE TABLE IF NOT EXISTS reviews (
 -- =========================
 
 -- Users
-INSERT INTO users (username, fullname, email, password) VALUES
-('admin', 'Admin User', 'admin@example.com', '$2b$10$kGRS6oS0u9g4EhaQkX21zOBF3jMC4BGxCgvVd7l0dAx3xpr2L6t6u'),
-('johndoe', 'John Doe', 'john@example.com',  '$2b$10$T8u/gyD2bUugGR7whmvN1O3Y0fMLBaOBvDljjZpi8v1D82YrQmoE2'),
-('janedoe', 'Jane Doe', 'jane@example.com',  '$2b$10$ZLWXyVv87TjbPbUXWwM2Fe.1GSmSioz4sW6b6QhTnBCSSbwsAhr5W');
-
+INSERT INTO users (username, fullname, email, password, roles) VALUES
+('admin', 'Admin User', 'admin@example.com', '$2b$10$4ED.IL8/XN3iTQm9OIxld.M7Vx3kBwNK4/g2ewTXMRuI.TgF4HnG6','admin'),
+('johndoe', 'John Doe', 'john@example.com',  '$2b$10$4KuyIcV5cBnjwV67QHMbS.k6Vyu3ToLQGp3AglNgyeNM2fxhUcTcW','user'),
+('janedoe', 'Jane Doe', 'jane@example.com',  '$2b$10$v2K8gVxZ.jwN9DYzXIZSh.n4ae9fHv82hR5sx3BRH/mePOcPTCny.','user');
 
 -- Products
-INSERT INTO products (name, price, stock, image_url) VALUES
-  ('shirt', 1500.00, 10, '/images/shirt.jpg'),
-  ('hat', 1200.00, 15, '/images/hat.jpg'),
-  ('hoodie', 400.00, 25, '/images/hoodie.jpg');
-
--- Cart
-INSERT INTO cart (user_id, product_id, quantity) VALUES
-  (2, 1, 1),
-  (3, 2, 2);
-
--- Orders
-INSERT INTO orders (user_id, total, status) VALUES
-  (1, 2700.00, 'completed');
+INSERT INTO products (name, slug, price, stock, description, image_url) VALUES
+  ('Shirt',  'shirt',  1500.00, 10, 'Comfortable cotton shirt', '/images/shirt.jpg'),
+  ('Hat',    'hat',    1200.00, 15, 'Stylish summer hat', '/images/hat.jpg'),
+  ('Hoodie', 'hoodie',  400.00, 25, 'Warm and cozy hoodie', '/images/hoodie.jpg');
 
 -- Reviews
 INSERT INTO reviews (product_id, rating, comment) VALUES

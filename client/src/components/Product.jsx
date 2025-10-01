@@ -16,13 +16,18 @@ const Product = ({ product }) => {
 
   const addToCart = async (e) => {
     e.preventDefault();
+    e.stopPropagation();  // ✅ FIX: Ngăn event bubble lên Link, tránh navigate khi add
     setIsLoading(true);
     try {
+      if (!product || !product.id) {
+        throw new Error("Sản phẩm không hợp lệ");
+      }
+      console.log('🔍 Add to cart product:', { id: product.id, name: product.name });  // Log debug
       await addItem(product, 1);
       toast.success("Added to cart");
     } catch (error) {
-      console.log(error);
-      toast.error("Error adding to cart");
+      console.error('🔍 Add to cart error:', error);  // Log error
+      toast.error("Error adding to cart: " + (error.message || "Lỗi không xác định"));
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +64,7 @@ const Product = ({ product }) => {
               )
             }
             className="mt-4 transition duration-200 ease-out lg:bg-opacity-0 group-hover:bg-opacity-100"
-            onClick={(e) => addToCart(e)}
+            onClick={addToCart}  // ✅ Gọi trực tiếp, không (e) => vì đã có preventDefault
           >
             {isLoading ? null : "Add to Cart"}
           </Button>

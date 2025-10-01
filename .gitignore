@@ -10,19 +10,3 @@ dist
 client/public/sitemap.xml
 .terraform/
 .terraform.lock.hcl
-# Ignore all docker-compose files (v1/v2 naming)
-docker-compose*.yml
-docker-compose*.yaml
-**/docker-compose*.yml
-**/docker-compose*.yaml
-
-# (Tùy chọn) Ignore new Compose v2 default filenames
-compose.yml
-compose.yaml
-**/compose.yml
-**/compose.yaml
-
-# (Tùy chọn) vẫn cho phép file mẫu
-!docker-compose.example.yml
-!docker-compose.example.yaml
-

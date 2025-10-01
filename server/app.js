@@ -22,6 +22,7 @@ app.use(helmet());
 app.use(cookieParser());
 
 app.use("/api", routes);
+
 app.get("/", (req, res) =>
   res.send("<h1 style='text-align: center'>E-COMMERCE API</h1>")
 );

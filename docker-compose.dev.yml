@@ -8,9 +8,9 @@ services:
     env_file:
       - ./server/.env
     environment:
-      POSTGRES_DB: pernstore
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: newpassword
+      POSTGRES_PASSWORD: newpassword      
+      POSTGRES_DB: pernstore
     ports:
       - "5432:5432"
     volumes:
@@ -28,12 +28,19 @@ services:
     env_file:
       - ./server/.env
     environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: newpassword       # trùng với database
       POSTGRES_HOST: database
+      POSTGRES_PORT: "5432"
+      POSTGRES_DATABASE: pernstore         # QUAN TRỌNG – code của bạn đang đọc biến này
+      POSTGRES_DB: pernstore  
+      PGDATABASE: pernstore             # thêm alias, nếu code đọc tên khác
+      PORT: "3000"       
     volumes:
       - ./server:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - "9000:9000"
+      - "9000:3000" 
     depends_on:
       - database
     networks:
@@ -56,6 +63,8 @@ services:
       - server
     networks:
       - pernstore
+    environment:
+      VITE_API_URL: http://localhost:9000
 
   pgadmin:
     image: dpage/pgadmin4

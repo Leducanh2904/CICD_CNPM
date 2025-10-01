@@ -1,7 +1,7 @@
 import { Badge, Button, Dropdown, DropdownItem, Transition } from "@windmill/react-ui";
 import { useCart } from "context/CartContext";
 import { useUser } from "context/UserContext";
-import { useState } from "react";
+import { useState, useEffect } from "react"; 
 import { LogOut, ShoppingCart, User } from "react-feather";
 import { Link } from "react-router-dom";
 
@@ -13,7 +13,7 @@ const Nav = () => {
   return (
     <nav className="flex items-center justify-between px-2 lg:px-36 py-2 shadow-lg fixed w-full bg-white top-0 z-10">
       <Link to="/" className="text-gray-700 text-2xl font-bold dark:text-gray-400">
-        <h1>PERN Store</h1>
+        <h1>Food Fast</h1>
       </Link>
       <ul className="flex space-x-4">
         {!isLoggedIn && (
@@ -31,7 +31,7 @@ const Nav = () => {
                   <span className="lg:block hidden">Cart</span>
                   <ShoppingCart className="lg:hidden" />
                   <Badge className="ml-2" type="danger">
-                    {cartTotal}
+                    {cartTotal || 0}  {/* ✅ FIX: Fallback 0 nếu undefined/NaN */}
                   </Badge>{" "}
                 </Button>
               </Link>
@@ -47,7 +47,7 @@ const Nav = () => {
                   <span className="lg:block hidden">Cart</span>
                   <ShoppingCart className="lg:hidden" />
                   <Badge className="ml-2" type="danger">
-                    {cartTotal}
+                    {cartTotal || 0}  {/* ✅ FIX: Fallback 0 nếu undefined/NaN */}
                   </Badge>{" "}
                 </Button>
               </Link>

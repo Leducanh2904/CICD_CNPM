@@ -1,4 +1,3 @@
-// src/context/CartContext.jsx - FIXED: Refetch full cart sau mỗi API action để sync items chính xác
 import localCart from "helpers/localStorage";
 import { createContext, useContext, useMemo, useEffect, useState, useCallback } from "react";
 import cartService from "services/cart.service";
@@ -13,14 +12,12 @@ const CartProvider = ({ children }) => {
   
   const { isLoggedIn } = useUser();
 
-  // ✅ useEffect 1: Fetch/Sync cart khi isLoggedIn thay đổi (giữ nguyên)
   useEffect(() => {
     setIsLoading(true);
 
     const syncCart = async () => {
       if (isLoggedIn) {
         try {
-          // Sync local -> server nếu có items local
           const items = localCart.getItems();
           if (items && items.length > 0) {
             const cartPromises = items.map(({ product_id, quantity }) =>
@@ -33,7 +30,6 @@ const CartProvider = ({ children }) => {
             localCart.clearCart();
           }
 
-          // Fetch từ server
           const res = await cartService.getCart();
           const fetchedItems = Array.isArray(res?.data) ? res.data : (res?.data?.items || []);
           setCartData({ items: fetchedItems });
@@ -53,7 +49,6 @@ const CartProvider = ({ children }) => {
     syncCart();
   }, [isLoggedIn]);
 
-  // ✅ useMemo derive totals (giữ nguyên - immediate update)
   const { cartTotal, cartSubtotal } = useMemo(() => {
     const items = cartData?.items || [];
     const quantity = items.reduce((acc, cur) => acc + Number(cur.quantity || 0), 0);
@@ -63,7 +58,6 @@ const CartProvider = ({ children }) => {
     return { cartTotal: quantity, cartSubtotal: totalAmt };
   }, [cartData]);
 
-  // ✅ Helper: Refetch full cart từ server (chỉ logged in)
   const refetchCart = useCallback(async () => {
     if (isLoggedIn) {
       try {
@@ -77,14 +71,12 @@ const CartProvider = ({ children }) => {
     }
   }, [isLoggedIn]);
 
-  // ✅ Helper: Optimistic update (giữ nguyên)
   const optimisticUpdate = useCallback((updateFn, fallbackFn) => {
     const prevItems = cartData.items || [];
     updateFn();
     return () => fallbackFn(prevItems);
   }, [cartData.items]);
 
-  // ✅ addItem: Optimistic + API + refetch full cart
   const addItem = async (product, quantity = 1) => {
     if (!product || !product.id) {
       throw new Error("Sản phẩm không hợp lệ");
@@ -94,15 +86,14 @@ const CartProvider = ({ children }) => {
     let rollback;
 
     if (isLoggedIn) {
-      // Optimistic add
       rollback = optimisticUpdate(
         () => setCartData({ items: [...(cartData.items || []), newItem] }),
         (prevItems) => setCartData({ items: prevItems })
       );
 
       try {
-        await cartService.addToCart(product.id, quantity); // Await confirm, không cần response items
-        await refetchCart(); // ✅ FIX: Refetch full để sync chính xác
+        await cartService.addToCart(product.id, quantity); 
+        await refetchCart(); 
         rollback = null;
       } catch (error) {
         rollback();
@@ -111,14 +102,12 @@ const CartProvider = ({ children }) => {
         throw error;
       }
     } else {
-      // Guest: Sync local
       localCart.addItem(product, quantity);
       const newItems = localCart.getItems() || [];
       setCartData({ items: newItems });
     }
   };
 
-  // ✅ deleteItem: Optimistic + API + refetch
   const deleteItem = async (product_id) => {
     const prevItems = cartData.items || [];
     const newItems = prevItems.filter((item) => item.product_id !== product_id);
@@ -132,7 +121,7 @@ const CartProvider = ({ children }) => {
 
       try {
         await cartService.removeFromCart(product_id);
-        await refetchCart(); // ✅ FIX: Refetch full
+        await refetchCart();
         rollback = null;
       } catch (error) {
         rollback();
@@ -146,7 +135,6 @@ const CartProvider = ({ children }) => {
     }
   };
 
-  // ✅ increment: Optimistic + API + refetch
   const increment = async (product_id) => {
     const prevItems = cartData.items || [];
     const updatedItems = prevItems.map(item =>
@@ -162,7 +150,7 @@ const CartProvider = ({ children }) => {
 
       try {
         await cartService.increment(product_id);
-        await refetchCart(); // ✅ FIX: Refetch full
+        await refetchCart();
         rollback = null;
       } catch (error) {
         rollback();
@@ -175,7 +163,6 @@ const CartProvider = ({ children }) => {
     }
   };
 
-  // ✅ decrement: Optimistic + API + refetch
   const decrement = async (product_id) => {
     const prevItems = cartData.items || [];
     const updatedItems = prevItems.map(item =>
@@ -193,7 +180,7 @@ const CartProvider = ({ children }) => {
 
       try {
         await cartService.decrement(product_id);
-        await refetchCart(); // ✅ FIX: Refetch full
+        await refetchCart(); 
         rollback = null;
       } catch (error) {
         rollback();

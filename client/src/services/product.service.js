@@ -5,10 +5,9 @@ class ProductService {
     return API.get(`/products/?page=${page}`);
   }
   getProduct(id) {
-    return API.get(`/products/id/${id}`);  // ✅ Fix: Route chính xác là /id/:id theo BE
+    return API.get(`/products/id/${id}`); 
   }
   getProductBySlug(slug) {
-    // ✅ FIX: Thêm no-cache headers để tránh 304 (cache cũ) và force fetch fresh data
     return API.get(`/products/${slug}`, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -22,7 +21,11 @@ class ProductService {
     });
   }
   getProductByName(name) {
-    return API.get(`/products/name/${name}`);  // ✅ Fix: Route chính xác là /name/:name theo BE
+    return API.get(`/products/name/${name}`); 
+  }
+
+  getStoreProducts(storeId, page) {
+    return API.get(`/stores/${storeId}/products?page=${page}`);
   }
 }
 

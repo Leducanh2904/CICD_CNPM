@@ -13,6 +13,7 @@ const {
   createProductReview,
   updateProductReview,
   getProductBySlug,
+  // getStoreProducts,  
 } = require("../controllers/products.controller");
 
 const verifyAdmin = require("../middleware/verifyAdmin");
@@ -53,5 +54,7 @@ router
   .get(getProductReviews)
   .post(verifyToken, createProductReview)
   .put(verifyToken, updateProductReview);
+
+//router.route("/:store_id").get(getStoreProducts); 
 
 module.exports = router;

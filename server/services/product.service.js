@@ -4,8 +4,8 @@ const {
   getProductDb,
   updateProductDb,
   deleteProductDb,
-  getProductByNameDb,
   getProductBySlugDb,
+  getAllProductsByStoreDb, 
 } = require("../db/product.db");
 const { ErrorHandler } = require("../helpers/error");
 
@@ -84,6 +84,21 @@ class ProductService {
       return await deleteProductDb(id);
     } catch (error) {
       throw new ErrorHandler(error.statusCode, error.message);
+    }
+  };
+
+  getProductsByStore = async (store_id, page) => {
+    const limit = 12;
+    const offset = (page - 1) * limit;
+    try {
+      const products = await getAllProductsByStoreDb({ store_id, limit, offset });
+      return {
+        success: true,
+        data: products,
+        total: products.length, 
+      };
+    } catch (error) {
+      throw new ErrorHandler(500, error.message);
     }
   };
 }

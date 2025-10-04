@@ -1,30 +1,27 @@
 const pool = require("../config");
 const productService = require("../services/product.service");
 
-// ✅ Helper function để generate slug từ name (sử dụng khi tạo hoặc update product)
 const generateSlug = (name) => {
   if (!name) return null;
   return name
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '')  // Xóa ký tự đặc biệt
-    .replace(/[\s_-]+/g, '-')   // Thay space hoặc _ bằng -
-    .replace(/^-+|-+$/g, '');   // Xóa - ở đầu/cuối
+    .replace(/[^\w\s-]/g, '') 
+    .replace(/[\s_-]+/g, '-')  
+    .replace(/^-+|-+$/g, '');  
 };
 
-// Lấy tất cả sản phẩm (có phân trang) - KHÔNG THAY ĐỔI
 const getAllProducts = async (req, res) => {
   const { page = 1 } = req.query;
   const products = await productService.getAllProducts(page);
   res.json(products);
 };
 
-// Tạo sản phẩm mới (có upload ảnh) - ✅ FIX: Thêm stock, generate slug tự động
 const createProduct = async (req, res) => {
   try {
     const { name, price, stock, description } = req.body;
     const image = req.file ? `/images/${req.file.filename}` : null;
-    const slug = generateSlug(name);  // ✅ Tự generate slug từ name
+    const slug = generateSlug(name);
 
     if (!slug) {
       return res.status(400).json({ message: "Invalid product name for slug" });
@@ -32,24 +29,23 @@ const createProduct = async (req, res) => {
 
     const newProduct = await productService.addProduct({
       name,
-      slug,  // ✅ Pass slug vào service
-      price: parseFloat(price),  // ✅ Parse price thành number
-      stock: parseInt(stock) || 0,  // ✅ Parse stock, default 0
+      slug, 
+      price: parseFloat(price), 
+      stock: parseInt(stock) || 0, 
       description,
       image,
     });
 
-    res.status(201).json(newProduct);  // ✅ Status 201 cho create
+    res.status(201).json(newProduct); 
   } catch (error) {
     console.error('Create product error:', error);
     res.status(500).json({ message: "Error creating product", error: error.message });
   }
 };
 
-// Lấy sản phẩm theo ID (route /id/:id) - ✅ FIX: Sử dụng đúng param id
 const getProduct = async (req, res) => {
   try {
-    const { id } = req.params;  // ✅ Lấy id từ params
+    const { id } = req.params;  
     const product = await productService.getProductById(id);
     res.status(200).json(product);
   } catch (error) {
@@ -62,14 +58,12 @@ const getProductBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
     const product = await productService.getProductBySlug(slug);
-    // Service đã throw 404 nếu không tìm thấy, nên không cần check lại
     res.status(200).json(product);
   } catch (error) {
     res.status(error.statusCode || 500).json({ message: error.message });
   }
 };
 
-// Lấy sản phẩm theo tên - ✅ FIX: Trả về product nếu có, handle error
 const getProductByName = async (req, res) => {
   try {
     const { name } = req.params;
@@ -81,28 +75,26 @@ const getProductByName = async (req, res) => {
   }
 };
 
-// Cập nhật sản phẩm (có thể thay ảnh mới) - ✅ FIX: Generate new slug nếu name thay đổi, lấy id từ old slug, parse stock/price
 const updateProduct = async (req, res) => {
   try {
     const { name, price, stock, description } = req.body;
     const { slug: oldSlug } = req.params;
     const image = req.file ? `/images/${req.file.filename}` : null;
-    const newSlug = generateSlug(name);  // ✅ Generate slug mới từ name mới
+    const newSlug = generateSlug(name); 
 
     if (!newSlug) {
       return res.status(400).json({ message: "Invalid product name for slug" });
     }
 
-    // ✅ Lấy product hiện tại để có id (vì DB update bằng id)
     const currentProduct = await productService.getProductBySlug(oldSlug);
     if (!currentProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
 
     const updatedProduct = await productService.updateProduct({
-      id: currentProduct.id,  // ✅ Pass id để update
+      id: currentProduct.id,  
       name,
-      slug: newSlug,  // ✅ Update slug mới
+      slug: newSlug,  
       price: parseFloat(price),
       stock: parseInt(stock) || 0,
       description,
@@ -116,16 +108,15 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// Xóa sản phẩm - ✅ FIX: Lấy id từ slug trước khi delete
 const deleteProduct = async (req, res) => {
   try {
     const { slug } = req.params;
-    const productToDelete = await productService.getProductBySlug(slug);  // ✅ Lấy product để có id
+    const productToDelete = await productService.getProductBySlug(slug); 
     if (!productToDelete) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const deletedProduct = await productService.removeProduct(productToDelete.id);  // ✅ Delete bằng id
+    const deletedProduct = await productService.removeProduct(productToDelete.id); 
     res.status(200).json(deletedProduct);
   } catch (error) {
     console.error('Delete product error:', error);
@@ -133,9 +124,7 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-// ---------------- Reviews ---------------- (KHÔNG THAY ĐỔI - giữ nguyên)
 
-// Lấy review của sản phẩm
 const getProductReviews = async (req, res) => {
   const { product_id, user_id } = req.query;
   try {
@@ -162,10 +151,9 @@ const getProductReviews = async (req, res) => {
   }
 };
 
-// Thêm review mới - ✅ Fix: Thêm user_id từ req.user
 const createProductReview = async (req, res) => {
   const { product_id, content, rating } = req.body;
-  const user_id = req.user.user_id || req.user.id;  // ✅ Fix: user_id hoặc id tùy payload token
+  const user_id = req.user.user_id || req.user.id; 
 
   try {
     const result = await pool.query(
@@ -173,20 +161,19 @@ const createProductReview = async (req, res) => {
        VALUES($1, $2, $3, $4) returning *`,
       [user_id, product_id, content, rating]
     );
-    res.status(201).json(result.rows[0]);  // ✅ Trả về single row
+    res.status(201).json(result.rows[0]); 
   } catch (error) {
     console.error('Create review error:', error);
     res.status(500).json({ message: error.detail || error.message });
   }
 };
 
-// Cập nhật review - KHÔNG THAY ĐỔI NHƯNG THÊM TRY-CATCH
 const updateProductReview = async (req, res) => {
   const { content, rating, id } = req.body;
 
   try {
     const result = await pool.query(
-      `UPDATE reviews set comment = $1, rating = $2 where id = $3 returning *`,  // ✅ Fix: comment thay vì content
+      `UPDATE reviews set comment = $1, rating = $2 where id = $3 returning *`,  
       [content, rating, id]
     );
     if (result.rowCount === 0) {
@@ -199,15 +186,17 @@ const updateProductReview = async (req, res) => {
   }
 };
 
+
 module.exports = {
-  getProduct,
+  getAllProducts,
   createProduct,
+  getProduct,
+  getProductBySlug,
+  getProductByName,
   updateProduct,
   deleteProduct,
-  getAllProducts,
-  getProductByName,
-  getProductBySlug,
   getProductReviews,
-  updateProductReview,
   createProductReview,
+  updateProductReview,
+  // getStoreProducts, 
 };

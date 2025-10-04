@@ -1,81 +1,79 @@
 version: "3.8"
 
 services:
-  server:
-    image: pern-store-server
-    container_name: pern-store-server
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    # restart: always
+  database:
+    container_name: pern-store-db
+    image: postgres:15
+    restart: always
     env_file:
       - ./server/.env
     environment:
-      - POSTGRES_HOST=3.84.191.228
-      - POSTGRES_DB=pernstore
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=newpassword
-    volumes:
-      # Maps the server directory to
-      # the working directory in the container
-      - ./server:/usr/src/app
-      # Maps the node_modules directory to
-      # the working directory in the container
-      # and also fixes bcrypt error
-      - /usr/src/app/node_modules
+      POSTGRES_DB: pernstore
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: newpassword
     ports:
-      - 9000:9000
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./server/config/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pernstore
-    # depends_on:
-    #   - database
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: pern-store-server
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      POSTGRES_HOST: database
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "9000:9000"
+    depends_on:
+      - database
+    networks:
+      - pernstore
+
   client:
-    image: pern-store-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
     container_name: pern-store-client
     restart: unless-stopped
     env_file:
       - ./client/.env
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    ports:
-      - 3001:3000
     volumes:
       - ./client:/usr/src/app
       - /usr/src/app/node_modules
+    ports:
+      - "3001:3000"
     depends_on:
       - server
     networks:
       - pernstore
-  # database:
-  #   container_name: pern-store-db
-  #   image: postgres
-  #   restart: always
-  #   env_file:
-  #     - ./server/.env
-  #   environment:
-  #     # other environment variables is in ./server/.env file
-  #     - POSTGRES_PASSWORD=adminuser
-  #   ports:
-  #     - 7890:5432
-  #   volumes:
-  #     - ./db:/var/lib/postgresql/data
-  #     # When the PostgreSQL container is started it will run any scripts
-  #     # provided in the `docker-entrypoint-initdb.d` directory
-  #     # seed the database with the init.sql file
-  #     - ./server/config/init.sql:/docker-entrypoint-initdb.d/init.sql
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: "dhatguy@mail.com"
-  #     PGADMIN_DEFAULT_PASSWORD: "qwertyuiop"
-  #   ports:
-  #     - "16543:80"
-  #   depends_on:
-  #     - database
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pern-store-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@mail.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin123"
+    ports:
+      - "16543:80"
+    depends_on:
+      - database
+    networks:
+      - pernstore
+
 networks:
-  pernstore: 
+  pernstore:
     driver: bridge
+
 volumes:
   db:
     driver: local

@@ -24,7 +24,7 @@ import StoreDetails from "pages/StoreDetails";
 import ProductDetails from "pages/ProductDetails"; 
 import AdminLayout from "admin/AdminLayout";
 import AdminDashboard from "admin/pages/Dashboard";
-import AdminProducts from "admin/pages/Products";
+import AdminProducts from "admin/pages/Stores";
 import AdminOrders from "admin/pages/Orders";
 
 function App() {

@@ -1,7 +1,7 @@
 import { useCart } from "context/CartContext";
 import { formatCurrency } from "helpers/formatCurrency";
 
-const OrderSummary = () => {
+const OrderSummary = ({ baseImageUrl = '' }) => {  
   const { cartData, cartSubtotal } = useCart();
   return (
     <div>
@@ -12,7 +12,7 @@ const OrderSummary = () => {
             className="w-2/5"
             loading="lazy"
             decoding="async"
-            src={item.image_url}
+            src={`${baseImageUrl}${item.image_url || '/placeholder-image.jpg'}`}
             alt={item.name}
           />
           <div className="flex flex-col space-y-1">

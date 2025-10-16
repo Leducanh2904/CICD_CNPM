@@ -8,6 +8,7 @@ const {
   deleteUserDb,
   getAllUsersDb,
   getUserByUsernameDb,
+  getUsersByRoleDb,  
 } = require("../db/user.db");
 const { ErrorHandler } = require("../helpers/error");
 
@@ -100,6 +101,14 @@ class UserService {
   getAllUsers = async () => {
     try {
       return await getAllUsersDb();
+    } catch (error) {
+      throw new ErrorHandler(error.statusCode, error.message);
+    }
+  };
+
+  getUsersByRole = async (role) => {
+    try {
+      return await getUsersByRoleDb(role);  
     } catch (error) {
       throw new ErrorHandler(error.statusCode, error.message);
     }

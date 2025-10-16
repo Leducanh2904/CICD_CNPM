@@ -125,18 +125,22 @@ CREATE TABLE IF NOT EXISTS cart (
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
     quantity INT DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Optional: Để sort items
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
 
 ALTER TABLE cart ADD CONSTRAINT unique_user_product UNIQUE (user_id, product_id);
 
+
 -- =========================
--- Orders
+-- Orders (thêm amount, ref, payment_method)
 -- =========================
 CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    amount NUMERIC(10,2),
     total NUMERIC(10,2),
+    ref VARCHAR(255),
+    payment_method VARCHAR(50),
     status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -277,6 +281,7 @@ CREATE TABLE IF NOT EXISTS coupon_approvals (
     decided_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+<<<<<<< Updated upstream
 -- =========================
 -- Carts
 -- =========================
@@ -300,6 +305,9 @@ CREATE TABLE IF NOT EXISTS cart_items (
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (cart_id, item_id)
 );
+=======
+
+>>>>>>> Stashed changes
 
 -- =========================
 -- Order Items
@@ -307,14 +315,21 @@ CREATE TABLE IF NOT EXISTS cart_items (
 CREATE TABLE IF NOT EXISTS order_items (
     id SERIAL PRIMARY KEY,
     order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+<<<<<<< Updated upstream
     item_id INT REFERENCES items(id),
+=======
+    product_id INT REFERENCES products(id) ON DELETE CASCADE,
+>>>>>>> Stashed changes
     item_name VARCHAR(255) NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
     unit_price NUMERIC(12,2) NOT NULL,
     discount NUMERIC(12,2) NOT NULL DEFAULT 0,
     line_total NUMERIC(12,2) NOT NULL
 );
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 -- =========================
 -- Payments
 -- =========================
@@ -397,17 +412,23 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+<<<<<<< Updated upstream
+=======
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_address_id INT REFERENCES addresses(id) ON DELETE SET NULL;
+
+>>>>>>> Stashed changes
 -- Sample Data
 -- Users
 INSERT INTO users (username, fullname, email, password, roles) VALUES
 ('admin', 'Admin User', 'admin@example.com', '$2b$10$4ED.IL8/XN3iTQm9OIxld.M7Vx3kBwNK4/g2ewTXMRuI.TgF4HnG6','admin'),
-('johndoe', 'John Doe', 'john@example.com',  '$2b$10$4KuyIcV5cBnjwV67QHMbS.k6Vyu3ToLQGp3AglNgyeNM2fxhUcTcW','user'),
+('johndoe', 'John Doe', 'john@example.com',  '$2b$10$4KuyIcV5cBnjwV67QHMbS.k6Vyu3ToLQGp3AglNgyeNM2fxhUcTcW','seller'),
 ('janedoe', 'Jane Doe', 'jane@example.com',  '$2b$10$v2K8gVxZ.jwN9DYzXIZSh.n4ae9fHv82hR5sx3BRH/mePOcPTCny.','user');
 
 -- Stores (owner_id = 2 = johndoe)
 INSERT INTO stores (owner_id, name, email, phone, description, is_active) VALUES
 (2, 'Cửa hàng ABC', 'abc@store.com', '0123456789', 'Cửa hàng thời trang cao cấp', true),
 (2, 'Cửa hàng XYZ', 'xyz@store.com', '0987654321', 'Cửa hàng đồ điện tử', true);
+<<<<<<< Updated upstream
 
 INSERT INTO store_addresses (store_id, line1, city, country) VALUES
 (1, '123 Đường ABC', 'Hà Nội', 'VN'),
@@ -418,7 +439,19 @@ INSERT INTO products (name, slug, price, stock, description, image_url, store_id
 ('Shirt', 'shirt', 1500.00, 10, 'Comfortable cotton shirt', '/images/shirt.jpg', 1),
 ('Hat', 'hat', 1200.00, 15, 'Stylish summer hat', '/images/hat.jpg', 1),
 ('Hoodie', 'hoodie', 400.00, 25, 'Warm and cozy hoodie', '/images/hoodie.jpg', 2);
+=======
+>>>>>>> Stashed changes
 
+INSERT INTO store_addresses (store_id, line1, city, country) VALUES
+(1, '123 Đường ABC', 'Hà Nội', 'VN'),
+(2, '456 Đường XYZ', 
+'TP.HCM', 'VN');
+
+-- Products (gán store_id)
+INSERT INTO products (name, slug, price, stock, description, image_url, store_id) VALUES
+('Shirt', 'shirt', 1500.00, 10, 'Comfortable cotton shirt', '/images/shirt.jpg', 1),
+('Hat', 'hat', 1200.00, 15, 'Stylish summer hat', '/images/hat.jpg', 1),
+('Hoodie', 'hoodie', 400.00, 25, 'Warm and cozy hoodie', '/images/hoodie.jpg', 2);
 -- Reviews
 INSERT INTO reviews (product_id, rating, comment) VALUES
 (1, 5, 'Excellent laptop, very fast!'),

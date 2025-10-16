@@ -1,4 +1,3 @@
-// services/cart.service.js - FIXED cho schema flat: Truyền user_id trực tiếp vào DB
 const {
   createCartDb,
   getCartDb,
@@ -7,6 +6,7 @@ const {
   increaseItemQuantityDb,
   decreaseItemQuantityDb,
   emptyCartDb,
+  getCartCountDb,  // Thêm import
 } = require("../db/cart.db");
 const { ErrorHandler } = require("../helpers/error");
 
@@ -16,6 +16,7 @@ class CartService {
       // Không cần explicit create (addItem sẽ tự insert nếu chưa có), nhưng giữ để tương thích
       return await createCartDb(userId);
     } catch (error) {
+      console.error('Service Error in createCart:', error);
       throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
@@ -27,6 +28,7 @@ class CartService {
       }
       return await getCartDb(userId);
     } catch (error) {
+      console.error('Service Error in getCart:', error);
       throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
@@ -39,6 +41,7 @@ class CartService {
       }
       return await addItemDb({ user_id, product_id, quantity });
     } catch (error) {
+      console.error('Service Error in addItem:', error);
       throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
@@ -51,6 +54,7 @@ class CartService {
       }
       return await deleteItemDb({ user_id, product_id });
     } catch (error) {
+      console.error('Service Error in removeItem:', error);
       throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
@@ -63,6 +67,7 @@ class CartService {
       }
       return await increaseItemQuantityDb({ user_id, product_id });
     } catch (error) {
+      console.error('Service Error in increaseQuantity:', error);
       throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
@@ -75,17 +80,32 @@ class CartService {
       }
       return await decreaseItemQuantityDb({ user_id, product_id });
     } catch (error) {
+      console.error('Service Error in decreaseQuantity:', error);
       throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
 
-  emptyCart = async (userId) => {  // Thay cartId bằng userId
+  clearCart = async (userId) => {  // Đổi tên từ emptyCart thành clearCart để match controller
     try {
       if (!userId) {
         throw new ErrorHandler(400, 'Thiếu user_id');
       }
       return await emptyCartDb(userId);
     } catch (error) {
+      console.error('Service Error in clearCart:', error);
+      throw new ErrorHandler(error.statusCode || 500, error.message);
+    }
+  };
+
+  // THÊM MỚI: getCartCount - Đếm số items (cho check empty trong orders)
+  getCartCount = async (userId) => {
+    try {
+      if (!userId) {
+        throw new ErrorHandler(400, 'Thiếu user_id');
+      }
+      return await getCartCountDb(userId);
+    } catch (error) {
+      console.error('Service Error in getCartCount:', error);
       throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };

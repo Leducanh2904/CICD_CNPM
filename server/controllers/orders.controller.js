@@ -2,43 +2,84 @@ const orderService = require("../services/order.service");
 const cartService = require("../services/cart.service");
 
 const createOrder = async (req, res) => {
-  const { amount, itemTotal, paymentMethod, ref } = req.body;
-  const userId = req.user.id;
-  const cartId = req.user.cart_id;
+  try {
+    const { amount, itemTotal, paymentMethod, ref, addressData } = req.body;
+    const userId = req.user.id;
 
-  const newOrder = await orderService.createOrder({
-    cartId,
-    amount,
-    itemTotal,
-    userId,
-    paymentMethod,
-    ref,
-  });
+    if (!userId || !amount || !itemTotal || !paymentMethod || !ref || !addressData) {
+      return res.status(400).json({ error: 'Missing required fields: amount, itemTotal, paymentMethod, ref, addressData' });
+    }
 
-  // delete all items from cart_items table for the user after order has been processed
-  await cartService.emptyCart(cartId);
+    const newOrder = await orderService.createOrder({
+      userId,
+      amount,
+      itemTotal,
+      paymentMethod,
+      ref,
+      addressData,
+    });
 
-  res.status(201).json(newOrder);
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error('Controller Error in createOrder:', error);
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
 };
 
+// Giữ nguyên 100%: User's own orders
 const getAllOrders = async (req, res) => {
-  const { page = 1 } = req.query;
-  const userId = req.user.id;
+  try {
+    const { page = 1 } = req.query;
+    const userId = req.user.id;
+    const orders = await orderService.getAllOrders(userId, parseInt(page));
+    res.json(orders);
+  } catch (error) {
+    console.error('Controller Error in getAllOrders:', error);
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
 
-  const orders = await orderService.getAllOrders(userId, page);
-  res.json(orders);
+// New: Admin all orders (separate)
+const getAllOrdersAdmin = async (req, res) => {
+  try {
+    const { page = 1 } = req.query;
+    const orders = await orderService.getAllOrdersAdmin(parseInt(page));
+    res.json(orders);
+  } catch (error) {
+    console.error('Controller Error in getAllOrdersAdmin:', error);
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
 };
 
 const getOrder = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.user.id;
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const order = await orderService.getOrderById({ id, userId });
+    res.json(order);
+  } catch (error) {
+    console.error('Controller Error in getOrder:', error);
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
 
-  const order = await orderService.getOrderById({ id, userId });
-  res.json(order);
+const updateStatus = async (req, res) => {
+  try {
+    const { ref } = req.params;
+    const { status } = req.body;
+    const userId = req.user.id;
+    const updated = await orderService.updateOrderStatus(ref, status, userId);
+    res.json(updated);
+  } catch (error) {
+    console.error('Controller Error in updateStatus:', error);
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
 };
 
 module.exports = {
   createOrder,
-  getAllOrders,
+  getAllOrders,  // Old
+  getAllOrdersAdmin,  // New
   getOrder,
+  updateStatus,
 };

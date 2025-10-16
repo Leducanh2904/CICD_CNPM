@@ -63,10 +63,23 @@ const decreaseItemQuantity = async (req, res) => {
   }
 };
 
+//clearCart: Xóa toàn bộ items trong cart của user
+const clearCart = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const result = await cartService.clearCart(userId);
+    res.json({ message: 'Cart cleared successfully', deleted: result.deleted });
+  } catch (error) {
+    console.error('Lỗi clearCart:', error);
+    res.status(error.statusCode || 500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getCart,
   addItem,
   increaseItemQuantity,
   decreaseItemQuantity,
   deleteItem,
+  clearCart,
 };

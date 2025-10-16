@@ -1,3 +1,7 @@
+<<<<<<< Updated upstream
+=======
+// Updated client/src/context/CartContext.jsx
+>>>>>>> Stashed changes
 import localCart from "helpers/localStorage";
 import { createContext, useContext, useMemo, useEffect, useState, useCallback } from "react";
 import cartService from "services/cart.service";
@@ -193,6 +197,21 @@ const CartProvider = ({ children }) => {
     }
   };
 
+  const clearCart = useCallback(async () => {
+    if (isLoggedIn) {
+      try {
+        await cartService.clearCart();
+        setCartData({ items: [] });
+      } catch (error) {
+        console.error('Lỗi clear cart server:', error);
+        toast.error("Lỗi xóa giỏ hàng");
+      }
+    } else {
+      localCart.clearCart();
+      setCartData({ items: [] });
+    }
+  }, [isLoggedIn]);
+
   return (
     <CartContext.Provider
       value={{
@@ -203,6 +222,7 @@ const CartProvider = ({ children }) => {
         deleteItem,
         increment,
         decrement,
+        clearCart,
         cartTotal,
         cartSubtotal,
       }}

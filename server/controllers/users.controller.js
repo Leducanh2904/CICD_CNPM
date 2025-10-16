@@ -80,6 +80,21 @@ const deleteUser = async (req, res) => {
   throw new ErrorHandler(401, "Unauthorized");
 };
 
+const allowedRoles = ['user', 'admin', 'seller'];  
+const getUsersByRole = async (req, res) => {
+  const { role } = req.query;
+  let results;
+  if (role) {
+    if (!allowedRoles.includes(role)) {
+      throw new ErrorHandler(400, `Unsupported role: ${role}. Allowed: ${allowedRoles.join(', ')}`);
+    }
+    results = await userService.getUsersByRole(role);
+  } else {
+    results = await userService.getAllUsers();
+  }
+  res.status(200).json(results);
+};
+
 module.exports = {
   getAllUsers,
   createUser,
@@ -87,4 +102,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getUserProfile,
+  getUsersByRole,
 };

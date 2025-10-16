@@ -14,9 +14,9 @@ API.interceptors.request.use(
     const token = localStorage.getItem("token"); // chuỗi JWT
     if (token) {
       req.headers["auth-token"] = token;
-      console.log("🔑 Attached token:", token);
+      // console.log("🔑 Attached token:", token);
     } else {
-      console.warn("⚠️ No token found in localStorage");
+      // console.warn("⚠️ No token found in localStorage");
     }
     return req;
   },

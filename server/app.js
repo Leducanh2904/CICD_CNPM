@@ -8,7 +8,7 @@ const helmet = require("helmet");
 const compression = require("compression");
 const unknownEndpoint = require("./middleware/unKnownEndpoint");
 const { handleError } = require("./helpers/error");
-
+const multer = require("multer");  
 const app = express();
 const path = require("path");
 app.use("/images", express.static(path.join(__dirname, "public/images")));
@@ -20,6 +20,8 @@ app.use(morgan("dev"));
 app.use(compression());
 app.use(helmet());
 app.use(cookieParser());
+const upload = multer({ storage: multer.memoryStorage() });
+app.use(upload.any()); 
 
 app.use("/api", routes);
 

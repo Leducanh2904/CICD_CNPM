@@ -8,7 +8,7 @@ const AdminLayout = () => {
         <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
         <nav className="flex flex-col gap-2">
           <Link to="/admin/dashboard" className="hover:text-yellow-400">Dashboard</Link>
-          <Link to="/admin/products" className="hover:text-yellow-400">Products</Link>
+          <Link to="/admin/products" className="hover:text-yellow-400">Stores</Link>
           <Link to="/admin/orders" className="hover:text-yellow-400">Orders</Link>
         </nav>
       </aside>

@@ -1,37 +1,49 @@
-
+// server/__tests__/middleware/verifyToken.test.js
 jest.mock("jsonwebtoken", () => ({ verify: jest.fn() }));
 const jwt = require("jsonwebtoken");
 const verifyToken = require("../../../middleware/verifyToken");
 
 const mockReq = (headers = {}) => ({
-  header: (key) => headers[key],
-  get: (key) => headers[key], // in case middleware uses req.get
+  header: (key) => headers[key] ?? headers[key?.toLowerCase()],
+  get:    (key) => headers[key] ?? headers[key?.toLowerCase()],
 });
-const mockRes = () => ({ });
+const mockRes = () => ({});
 const mockNext = () => jest.fn();
 
 describe("middleware/verifyToken", () => {
-  test("throws when token header is missing", () => {
+  test("gọi next(ErrorHandler 401) khi thiếu token header", () => {
     const req = mockReq({});
     const next = mockNext();
-    expect(() => verifyToken(req, mockRes(), next)).toThrow();
-    expect(next).not.toHaveBeenCalled();
+
+    verifyToken(req, mockRes(), next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    const err = next.mock.calls[0][0];
+    expect(err).toEqual(expect.objectContaining({ statusCode: 401 }));
   });
 
-  test("calls next() and attaches req.user when token is valid", () => {
+  test("next() & gắn req.user khi token hợp lệ", () => {
     jwt.verify.mockReturnValue({ id: 1, roles: "user" });
     const req = mockReq({ "auth-token": "abc" });
     const next = mockNext();
+
     verifyToken(req, mockRes(), next);
-    expect(req.user).toEqual({ id: 1, roles: "user" });
-    expect(next).toHaveBeenCalled();
+
+    expect(req.user).toEqual(expect.objectContaining({ id: 1, roles: "user" }));
+    // middleware của bạn còn normalize user_id nữa thì cũng ok:
+    // expect(req.user.user_id).toBe(1);
+    expect(next).toHaveBeenCalledWith(); // gọi next() không đối số
   });
 
-  test("throws when token is invalid", () => {
+  test("gọi next(ErrorHandler 401) khi token sai", () => {
     jwt.verify.mockImplementation(() => { throw new Error("bad token"); });
     const req = mockReq({ "auth-token": "invalid" });
     const next = mockNext();
-    expect(() => verifyToken(req, mockRes(), next)).toThrow();
-    expect(next).not.toHaveBeenCalled();
+
+    verifyToken(req, mockRes(), next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    const err = next.mock.calls[0][0];
+    expect(err).toEqual(expect.objectContaining({ statusCode: 401 }));
   });
 });

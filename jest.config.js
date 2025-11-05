@@ -10,26 +10,16 @@ module.exports = {
   clearMocks: true,
   moduleFileExtensions: ["js", "json"],
 };
+// jest.config.js (đặt ở repo root D:\CICD_CNPM\)
+// jest.config.js (ở repo root)
 module.exports = {
-  roots: ["<rootDir>/server"],
-  testMatch: ["**/__tests__/integration/**/*.int.test.js"],
   testEnvironment: "node",
-  globalSetup: "<rootDir>/server/__tests__/integration/setup/globalSetup.js",
-  globalTeardown: "<rootDir>/server/__tests__/integration/setup/globalTeardown.js",
-
-  // 👇 chạy TRƯỚC khi test import app.js
-  setupFiles: ["<rootDir>/server/__tests__/integration/setup/env-bridge.js"],
-
-  clearMocks: true,
-  maxWorkers: 1,
-};
-// jest.config.js
-module.exports = {
-  // ...
-  setupFiles: [
-    "<rootDir>/server/__tests__/integration/setup/env.setup.js"
+  roots: ["<rootDir>/server"],
+  testMatch: [
+    "**/__tests__/**/*.(test|spec).js",
+    "**/__tests__/**/*.(int|integration).test.js",
   ],
-  // Nếu đã có setupFilesAfterEnv, giữ nguyên – cái này dùng 'setupFiles'
+  setupFiles: ["<rootDir>/server/jest/env.setup.js"],
 };
 
 

@@ -68,7 +68,7 @@ const ProductDetails = () => {
             <img
               decoding="async"
               loading="lazy"
-              src={getImageUrl(product?.image_url)}  // ✅ FIX: Dùng helper để lấy full URL
+              src={getImageUrl(product?.image_url)} 
               alt={product?.name || 'Product image'}
               className="lg:w-1/2 w-full lg:h-auto h-64 object-contain md:object-cover object-center rounded"
               onError={(e) => {  // ✅ Fallback nếu ảnh load fail

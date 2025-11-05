@@ -26,7 +26,7 @@ let curDate = moment().format();
 class AuthService {
   async signUp(user) {
     try {
-      const { password, email, fullname, username } = user;
+      const { password, email, fullname, username, isSeller } = user;
       if (!email || !password || !fullname || !username) {
         throw new ErrorHandler(401, "all fields required");
       }
@@ -41,17 +41,17 @@ class AuthService {
         if (userByEmail) throw new ErrorHandler(401, "email taken already");
         if (userByUsername) throw new ErrorHandler(401, "username taken already");
 
-        // ✅ FIX: Tạo user
+        // ✅ FIX: Tạo user với roles tùy chọn (isSeller ? 'seller' : 'user')
+        const roles = isSeller ? 'seller' : 'user';  // ✅ Set roles dựa trên form
+
         const newUser = await createUserDb({
           ...user,
           password: hashedPassword,
+          roles,  // ✅ Truyền roles vào createUserDb
         });
 
         // ✅ FIX: Tạo cart với newUser.user_id (không newUser.id)
         const { id: cart_id } = await createCartDb(newUser.user_id);
-
-        // gán role mặc định nếu DB chưa set
-        const roles = newUser.roles || "user";
 
         // ✅ FIX: Token dùng newUser.user_id thay newUser.id
         const token = jwt.sign(
@@ -92,6 +92,12 @@ class AuthService {
 
       const user = await getUserByEmailDb(email);
       if (!user) throw new ErrorHandler(403, "Email or password incorrect.");
+
+      // ✅ THÊM: Check account_status locked
+      if (user.account_status === 'locked') {
+        throw new ErrorHandler(403, "Tài khoản đã bị khóa. Hãy liên hệ admin để biết thêm chi tiết.");
+      }
+
       if (user.google_id && !user.password) {
         throw new ErrorHandler(403, "Login in with Google");
       }
@@ -100,6 +106,7 @@ class AuthService {
         user_id,  // ✅ FIX: Destruct user_id thay id
         roles,
         cart_id,
+        account_status,  // ✅ THÊM: Destruct để dùng nếu cần sau
         fullname,
         username,
       } = user;
@@ -143,13 +150,7 @@ class AuthService {
     }
   }
 
-  // ✅ Giữ nguyên các hàm khác (googleLogin, forgotPassword, resetPassword, etc.)
-  // ... (paste tất cả code còn lại của file cũ vào đây, ví dụ googleLogin nếu có)
-  // Ví dụ placeholder cho các hàm khác:
-  // async googleLogin(...) { ... }
-  // async forgotPassword(...) { ... }
-  // async resetPassword(...) { ... }
-  // etc.
+
 }
 
 module.exports = new AuthService();

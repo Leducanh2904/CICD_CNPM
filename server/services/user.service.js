@@ -8,6 +8,10 @@ const {
   deleteUserDb,
   getAllUsersDb,
   getUserByUsernameDb,
+  getUsersByRoleDb,  
+  getTotalUsersDb,
+  updateStatusDb,  // Existing
+  getSellersWithoutStoreDb,  // ✅ Thêm import nếu chưa có
 } = require("../db/user.db");
 const { ErrorHandler } = require("../helpers/error");
 
@@ -97,13 +101,64 @@ class UserService {
     }
   };
 
-  getAllUsers = async () => {
+getAllUsers = async () => {
+  try {
+    let results = await getAllUsersDb(); 
+    results = results.filter(user => user.roles !== 'admin');
+    return results;
+  } catch (error) {
+    throw new ErrorHandler(error.statusCode || 500, error.message);
+  }
+};
+
+  getUsersByRole = async (role) => {
     try {
-      return await getAllUsersDb();
+      return await getUsersByRoleDb(role);  
     } catch (error) {
       throw new ErrorHandler(error.statusCode, error.message);
     }
   };
-}
+
+  getTotalUsers = async () => {
+    try {
+      return await getTotalUsersDb();
+    } catch (error) {
+      throw new ErrorHandler(error.statusCode || 500, error.message);
+    }
+  };
+
+  updateStatus = async ({ id, status, reason }) => {
+    try {
+      if (!['locked', 'active'].includes(status)) {
+        throw new ErrorHandler(400, 'Status must be "locked" or "active"');
+      }
+      if (!reason || reason.trim().length < 10) {
+        throw new ErrorHandler(400, 'Reason must be at least 10 characters');
+      }
+      const updatedUser = await updateStatusDb({
+        id,
+        status,
+        lockReason: status === 'locked' ? reason : null,
+        unlockReason: status === 'active' ? reason : null,
+      });
+      // Hide sensitive fields
+      updatedUser.password = undefined;
+      updatedUser.google_id = undefined;
+      updatedUser.cart_id = undefined;
+      return updatedUser;
+    } catch (error) {
+      throw new ErrorHandler(error.statusCode || 500, error.message);
+    }
+  };
+
+  // ✅ THÊM: Method này VÀO TRONG class (indent 2 spaces, trước } đóng class)
+  getSellersWithoutStore = async () => {
+    try {
+      return await getSellersWithoutStoreDb();
+    } catch (error) {
+      throw new ErrorHandler(error.statusCode || 500, error.message);
+    }
+  };
+}  // ✅ Đóng class SAU method mới
 
 module.exports = new UserService();

@@ -7,12 +7,14 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import PulseLoader from "react-spinners/PulseLoader";
+import { useNavigate } from "react-router-dom"; 
 
 const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { state } = useLocation();
   const { isLoggedIn, setUserState } = useUser();
+  const navigate = useNavigate();
   const {
     register,
     formState: { errors },
@@ -22,8 +24,8 @@ const Register = () => {
   const password = useRef({});
   password.current = watch("password", "");
 
-  const onSubmit = (data) => {
-    const { password, password2, username, name, email } = data;
+ const onSubmit = (data) => {
+    const { password, password2, username, name, email, isSeller } = data;
     setError("");
     if (password === password2) {
       setIsLoading(!isLoading);
@@ -32,14 +34,21 @@ const Register = () => {
         email,
         password,
         fullname: name,
+        isSeller,
       })
         .then(({ data }) => {
           setError("");
           toast.success("Account created successfully.");
-          setTimeout(() => {
-            setUserState(data);
-            setIsLoading(!isLoading);
-          }, 1000);
+          if (isSeller) {
+            navigate('/seller'); 
+          } else {
+
+            setTimeout(() => {
+              setUserState(data);
+              setIsLoading(!isLoading);
+              navigate(state?.from || "/");
+            }, 1000);
+          }
         })
         .catch(({ response }) => {
           setIsLoading(false);
@@ -167,6 +176,18 @@ const Register = () => {
                 {errors.password2.message}
               </HelperText>
             )}
+          </div>
+          {/* ✅ New: Checkbox đăng ký seller */}
+          <div className="mt-4 flex items-center">
+            <Input
+              type="checkbox"
+              name="isSeller"
+              {...register("isSeller")}
+              className="mr-2"
+            />
+            <Label className="text-grey-darker text-sm font-bold">
+              <span>Đăng ký làm người bán (Seller)</span>
+            </Label>
           </div>
           <Button type="submit" className="mt-4">
             {isLoading ? (

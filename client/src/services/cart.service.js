@@ -1,3 +1,4 @@
+// Updated client/src/services/cart.service.js
 import API from "../api/axios.config";
 
 class CartService {
@@ -20,6 +21,10 @@ class CartService {
 
   async decrement(product_id) {
     return API.put("/cart/decrement", { product_id });
+  }
+
+  async clearCart() {
+    return await API.post("/cart/clear");  
   }
 }
 

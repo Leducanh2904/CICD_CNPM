@@ -1,18 +1,23 @@
-const Stripe = require("stripe");
 const { ErrorHandler } = require("../helpers/error");
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const orderService = require("./order.service");
 
 class PaymentService {
-  payment = async (amount, email) => {
+  createIntent = async (data) => {
     try {
-      return await stripe.paymentIntents.create({
-        amount,
-        currency: "ngn",
-        payment_method_types: ["card"],
-        receipt_email: email,
-      });
+      const { amount, orderRef } = data;
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Pay+Order+${orderRef}+${amount}VND`;
+      return { qrUrl, orderRef };
     } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message);
+      throw new ErrorHandler(500, error.message);
+    }
+  };
+
+  verify = async (orderRef, userId) => {
+    try {
+      const result = await orderService.updateOrderStatus(orderRef, 'paid', userId);
+      return { success: true, ...result };
+    } catch (error) {
+      throw new ErrorHandler(500, error.message);
     }
   };
 }

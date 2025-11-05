@@ -1,12 +1,13 @@
 import API from "api/axios.config";
 
 class OrderService {
-  createOrder(amount, itemTotal, ref, paymentMethod) {
+  createOrder(amount, itemTotal, ref, paymentMethod, addressData) {
     return API.post("/orders/create", {
       amount,
       itemTotal,
       ref,
       paymentMethod,
+      addressData,
     });
   }
   getAllOrders(page) {
@@ -14,6 +15,9 @@ class OrderService {
   }
   getOrder(id) {
     return API.get(`/orders/${id}`);
+  }
+  updateOrderStatus(ref, status) {
+    return API.patch(`/orders/${ref}/status`, { status });
   }
 }
 

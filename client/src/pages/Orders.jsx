@@ -31,6 +31,21 @@ const Orders = () => {
     navigate(`/orders/${order.order_id}`, { state: { order } });
   };
 
+  // ✅ New: Handle confirm receipt (only if status='delivery')
+  const handleConfirmReceipt = async (order) => {
+    if (!confirm(`Xác nhận đã nhận hàng cho đơn #${order.order_id}?`)) return;
+    try {
+      await orderService.updateOrderStatus(order.ref, 'delivered');
+      // Refetch orders to update UI
+      const res = await orderService.getAllOrders(currentPage);
+      setOrders(res.data || { items: [], total: 0 });
+      alert('Đã xác nhận nhận hàng!');
+    } catch (error) {
+      console.error('Confirm receipt error:', error);
+      alert('Xác nhận thất bại: ' + (error.response?.data?.error || 'Lỗi không xác định'));
+    }
+  };
+
   useEffect(() => {
     if (!isLoggedIn) {
       setIsFetching(false);
@@ -79,10 +94,11 @@ const Orders = () => {
           <TableHeader>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>No. of items</TableCell>
+              <TableCell>Order No</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Amount</TableCell>
               <TableCell>Date</TableCell>
+              <TableCell>Action</TableCell> {/* ✅ Add column for Confirm button */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -93,6 +109,20 @@ const Orders = () => {
                 key={order.order_id}
               >
                 <OrderItem order={order} />
+                {/* ✅ New: Confirm Receipt button if status='delivery' */}
+                <TableCell>
+                  {order.status === 'delivery' && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click
+                        handleConfirmReceipt(order);
+                      }}
+                      className="px-4 py-2 bg-green-600 text-white rounded text-sm"
+                    >
+                      Confirm Receipt
+                    </button>
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

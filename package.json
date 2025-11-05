@@ -9,10 +9,15 @@
     "start": "node server",
     "server": "cd server && nodemon",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "test": "jest --runInBand",
+    "test:unit": "jest server/__tests__/unit --runInBand --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
 }

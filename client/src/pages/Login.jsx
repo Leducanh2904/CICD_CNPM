@@ -5,6 +5,7 @@ import { useUser } from "context/UserContext";
 import Layout from "layout/Layout";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom"; 
 import toast from "react-hot-toast";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import PulseLoader from "react-spinners/PulseLoader";
@@ -17,6 +18,7 @@ const Login = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [redirectToReferrer, setRedirectToReferrer] = useState(false);
   const { state } = useLocation();
+  const navigate = useNavigate();  // Thêm hook navigate
 
   const login = useGoogleLogin({
     onSuccess: (codeResponse) => handleGoogleLogin(codeResponse),
@@ -35,13 +37,33 @@ const Login = () => {
     },
   });
 
+  // Helper: Decode JWT payload từ token (extract roles)
+  const getTokenRoles = (token) => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.roles;  // Assume "roles": "admin" string từ backend
+    } catch (err) {
+      console.error("Cannot decode token:", err);
+      return null;
+    }
+  };
+
   async function handleGoogleLogin(googleData) {
     try {
       const data = await authService.googleLogin(googleData.code);
       toast.success("Login successful 🔓");
 
       setUserState(data);
-      setRedirectToReferrer(true);
+      
+      // Check role và redirect
+      const roles = getTokenRoles(data.token);
+      if (roles === 'admin') {
+        navigate('/admin');  
+      } else if(roles === 'seller'){
+        navigate('/seller');  
+      }else {
+        setRedirectToReferrer(true); 
+      }
       setIsGoogleLoading(false);
     } catch (error) {
       setIsGoogleLoading(false);
@@ -60,7 +82,17 @@ const Login = () => {
 
       setTimeout(() => {
         setUserState(data);
-        setRedirectToReferrer(true);
+        
+        // Check role và redirect
+        const roles = getTokenRoles(data.token);
+        if (roles === 'admin') {
+          navigate('/admin'); 
+        } else if (roles === 'seller'){
+          navigate('/seller'); 
+        }else{
+          setRedirectToReferrer(true); 
+          
+        }
         setIsLoading(false);
       }, 1500);
     } catch (error) {

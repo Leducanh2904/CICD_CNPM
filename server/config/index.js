@@ -16,7 +16,5 @@ const pool = new Pool({
   ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
 
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-  end: () => pool.end(),
-};
+// Export pool trực tiếp để có connect(), query(), end()
+module.exports = pool;

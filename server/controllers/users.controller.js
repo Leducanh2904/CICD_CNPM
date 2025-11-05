@@ -80,6 +80,61 @@ const deleteUser = async (req, res) => {
   throw new ErrorHandler(401, "Unauthorized");
 };
 
+const allowedRoles = ['user', 'admin', 'seller'];  
+const getUsersByRole = async (req, res) => {
+  const { role } = req.query;
+  let results;
+  if (role) {
+    if (!allowedRoles.includes(role)) {
+      throw new ErrorHandler(400, `Unsupported role: ${role}. Allowed: ${allowedRoles.join(', ')}`);
+    }
+    results = await userService.getUsersByRole(role);
+  } else {
+    results = await userService.getAllUsers();
+  }
+  res.status(200).json(results);
+};
+
+const lockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;  // Require reason
+    if (!reason) {
+      return res.status(400).json({ error: 'Lock reason is required' });
+    }
+    const updated = await userService.updateStatus({ id, status: 'locked', reason });
+    res.json({ success: true, user: updated });
+  } catch (error) {
+    console.error('Controller Error in lockUser:', error);
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+const unlockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;  // Require reason
+    if (!reason) {
+      return res.status(400).json({ error: 'Unlock reason is required' });
+    }
+    const updated = await userService.updateStatus({ id, status: 'active', reason });
+    res.json({ success: true, user: updated });
+  } catch (error) {
+    console.error('Controller Error in unlockUser:', error);
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
+const getAvailableSellers = async (req, res) => {
+  try {
+    const sellers = await userService.getSellersWithoutStore();
+    res.status(200).json(sellers);
+  } catch (error) {
+    console.error('Controller Error in getAvailableSellers:', error);
+    res.status(error.statusCode || 500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   createUser,
@@ -87,4 +142,8 @@ module.exports = {
   updateUser,
   deleteUser,
   getUserProfile,
+  getUsersByRole,
+  lockUser,
+  unlockUser,
+  getAvailableSellers
 };

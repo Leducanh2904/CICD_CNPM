@@ -44,11 +44,12 @@ class AuthService {
     });
   }
 
-  register(username, email, password) {
+  register(username, email, password, isSeller) {  // ✅ Thêm param isSeller
     return API.post("auth/signup", {
       username,
       email,
       password,
+      isSeller,  // ✅ Truyền isSeller vào body
     });
   }
 

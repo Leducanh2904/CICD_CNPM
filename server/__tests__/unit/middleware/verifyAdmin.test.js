@@ -1,7 +1,4 @@
-/**
- * Unit tests for middleware/verifyAdmin.js
- */
-const verifyAdmin = require("../../middleware/verifyAdmin");
+const verifyAdmin = require("../../../middleware/verifyAdmin");
 
 const withReq = (user) => ({ user });
 const res = {};

@@ -1,25 +1,29 @@
 /**
- * Unit tests for helpers/hashPassword.js
- * - We mock bcrypt to avoid slow hashing.
+ * helpers/hashPassword tests (patched)
+ * - Mock async bcrypt-like API: genSalt, hash, compare
+ * - Use await
  */
 jest.mock("bcrypt", () => ({
-  hashSync: jest.fn((plain, saltRounds) => `hashed(${plain})`),
-  compareSync: jest.fn((plain, hashed) => hashed === `hashed(${plain})`),
+  genSalt: jest.fn(async () => "salt"),
+  hash: jest.fn(async (plain, salt) => `hashed(${plain})`),
+  compare: jest.fn(async (plain, hashed) => hashed === `hashed(${plain})`),
 }));
 
 const bcrypt = require("bcrypt");
-const { hashPassword, comparePassword } = require("../../helpers/hashPassword");
+const { hashPassword, comparePassword } = require("../../../helpers/hashPassword");
 
-describe("helpers/hashPassword", () => {
-  test("hashPassword produces a different string", () => {
-    const hashed = hashPassword("secret");
+describe("helpers/hashPassword (async)", () => {
+  test("hashPassword produces a different string", async () => {
+    const hashed = await hashPassword("secret");
     expect(hashed).toBe("hashed(secret)");
-    expect(bcrypt.hashSync).toHaveBeenCalled();
+    expect(bcrypt.genSalt).toHaveBeenCalled();
+    expect(bcrypt.hash).toHaveBeenCalled();
   });
 
-  test("comparePassword validates correct password", () => {
-    const hashed = "hashed(secret)";
-    expect(comparePassword("secret", hashed)).toBe(true);
-    expect(comparePassword("wrong", hashed)).toBe(false);
+  test("comparePassword validates correct password", async () => {
+    const ok = await comparePassword("secret", "hashed(secret)");
+    const bad = await comparePassword("wrong", "hashed(secret)");
+    expect(ok).toBe(true);
+    expect(bad).toBe(false);
   });
 });

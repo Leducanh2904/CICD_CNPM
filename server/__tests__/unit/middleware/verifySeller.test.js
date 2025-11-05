@@ -1,25 +1,37 @@
 /**
- * Unit tests for middleware/verifySeller.js
+ * verifySeller middleware tests
+ * - Implementation calls next(err) on failures (Unauthorized / Access denied)
+ * - Success: next() without error
  */
-const verifySeller = require("../../middleware/verifySeller");
+const verifySeller = require("../../../middleware/verifySeller");
 
 const res = {};
-const next = () => jest.fn();
+const mkNext = () => jest.fn();
 
 describe("middleware/verifySeller", () => {
   test("passes when user has seller role (case-insensitive)", () => {
-    const n = next();
-    verifySeller({ user: { roles: "SeLLeR" } }, res, n);
-    expect(n).toHaveBeenCalled();
+    const next = mkNext();
+    verifySeller({ user: { roles: "SeLLeR" } }, res, next);
+    expect(next).toHaveBeenCalledTimes(1);
+    const [arg] = next.mock.calls[0];
+    expect(arg).toBeUndefined(); // no error
   });
 
-  test("throws when user missing", () => {
-    const n = next();
-    expect(() => verifySeller({}, res, n)).toThrow();
+  test("calls next with Unauthorized error when user missing", () => {
+    const next = mkNext();
+    verifySeller({}, res, next);
+    expect(next).toHaveBeenCalledTimes(1);
+    const [err] = next.mock.calls[0];
+    expect(err).toBeInstanceOf(Error);
+    expect(String(err)).toMatch(/Unauthorized/i);
   });
 
-  test("throws when role is not seller", () => {
-    const n = next();
-    expect(() => verifySeller({ user: { roles: "user" } }, res, n)).toThrow();
+  test("calls next with Access denied error when role is not seller", () => {
+    const next = mkNext();
+    verifySeller({ user: { roles: "user" } }, res, next);
+    expect(next).toHaveBeenCalledTimes(1);
+    const [err] = next.mock.calls[0];
+    expect(err).toBeInstanceOf(Error);
+    expect(String(err)).toMatch(/Access denied|Seller only/i);
   });
 });

@@ -1,7 +1,7 @@
 /**
  * Unit tests for services/product.service.js
  */
-jest.mock("../../db/product.db", () => ({
+jest.mock("../../../db/product.db", () => ({
   getAllProductsDb: jest.fn(),
   createProductDb: jest.fn(),
   getProductDb: jest.fn(),
@@ -11,8 +11,8 @@ jest.mock("../../db/product.db", () => ({
   getProductCountByStoreDb: jest.fn(),
 }));
 
-const db = require("../../db/product.db");
-const ProductService = require("../../services/product.service");
+const db = require("../../../db/product.db");
+const ProductService = require("../../../services/product.service");
 
 describe("ProductService.getAllProducts", () => {
   test("computes offset from page (page=1 => offset=0)", async () => {

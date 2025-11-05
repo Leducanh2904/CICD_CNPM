@@ -12,13 +12,20 @@
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "test": "jest --runInBand",
-    "test:unit": "jest server/__tests__/unit --runInBand --detectOpenHandles"
+    "test:unit": "jest server/__tests__/unit --runInBand --detectOpenHandles",
+    "test:integration": "jest --config jest.config.js --runInBand",
+    "test:all": "npm run test:unit && npm run test:integration"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "jest": "^30.2.0"
+    "@testcontainers/postgresql": "^11.7.2",
+    "dotenv": "^17.2.3",
+    "jest": "^30.2.0",
+    "pg": "^8.16.3",
+    "supertest": "^7.1.4",
+    "testcontainers": "^11.7.2"
   }
 }

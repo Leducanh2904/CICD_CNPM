@@ -1,0 +1,19 @@
+{
+  "JWT_SECRET": "testsecret",
+  "DATABASE_URL": "postgres://testuser:testpass@localhost:32786/testdb",
+  "PGHOST": "localhost",
+  "PGPORT": "32786",
+  "PGUSER": "testuser",
+  "PGPASSWORD": "testpass",
+  "PGDATABASE": "testdb",
+  "DB_HOST": "localhost",
+  "DB_PORT": "32786",
+  "DB_USER": "testuser",
+  "DB_PASSWORD": "testpass",
+  "DB_NAME": "testdb",
+  "DATABASE_HOST": "localhost",
+  "DATABASE_PORT": "32786",
+  "DATABASE_USER": "testuser",
+  "DATABASE_PASSWORD": "testpass",
+  "DATABASE_NAME": "testdb"
+}

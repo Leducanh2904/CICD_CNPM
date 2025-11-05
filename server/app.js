@@ -1,3 +1,29 @@
+if (process.env.NODE_ENV === 'test') {
+  console.log('[BOOT] NODE_ENV = test');
+  console.log('[BOOT] PG env:', {
+    PGHOST: process.env.PGHOST,
+    PGPORT: process.env.PGPORT,
+    PGUSER: process.env.PGUSER,
+    PGDATABASE: process.env.PGDATABASE,
+    hasDATABASE_URL: !!process.env.DATABASE_URL
+  });
+}
+
+// ---- inject test env early (only in test) ----
+if (process.env.NODE_ENV === "test") {
+  try {
+    const fs = require("fs");
+    const path = require("path");
+    const p = path.join(__dirname, "__tests__", "integration", "setup", ".it-env.json");
+    if (fs.existsSync(p)) {
+      const data = JSON.parse(fs.readFileSync(p, "utf8"));
+      for (const [k, v] of Object.entries(data)) process.env[k] = v;
+    }
+    process.env.JWT_SECRET = process.env.JWT_SECRET || "testsecret";
+  } catch {}
+}
+// ----------------------------------------------
+
 const express = require("express");
 require("express-async-errors");
 const cors = require("cors");
@@ -31,3 +57,4 @@ app.use(unknownEndpoint);
 app.use(handleError);
 
 module.exports = app;
+

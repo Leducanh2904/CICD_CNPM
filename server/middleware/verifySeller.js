@@ -1,5 +1,4 @@
-app.get('/api/health', (req, res) => res.status(200).send('ok'));
-app.head('/api/health', (req, res) => res.sendStatus(200));
+
 const { ErrorHandler } = require("../helpers/error");
 
 module.exports = (req, res, next) => {

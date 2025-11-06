@@ -1,14 +1,15 @@
+# loại toàn bộ node_modules của cả repo
 node_modules
-*.env
-*.vscode
-client/.eslintcache
+**/node_modules
 
-# Local Netlify folder
-.netlify
-/db
-!server/db/
-!server/db/store.db.js
+# các thứ không cần
+.git
+.gitignore
+.vscode
+*.env
+client/.eslintcache
 dist
-client/public/sitemap.xml
-.terraform/
+.netlify
+.terraform
 .terraform.lock.hcl
+db

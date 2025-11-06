@@ -23,10 +23,6 @@ jobs:
       - name: Install deps (root)
         run: npm ci
 
-      # Nếu server có package riêng, cài thêm:
-      # - name: Install deps (server)
-      #   run: cd server && npm ci
-
       - name: Run unit tests
         run: npm run test:unit
 

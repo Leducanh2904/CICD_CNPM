@@ -15,10 +15,9 @@
     "server": "cd server && nodemon",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "test": "jest --runInBand",
+    "test": "npm run test:unit && npm run test:integration",
     "test:unit": "jest server/__tests__/unit --runInBand --detectOpenHandles",
-    "test:integration": "jest --config jest.config.js --runInBand",
-    "test:controllers": "jest server/__tests__/controllers --runInBand",
+    "test:integration": "jest server/__tests__/integration --runInBand",
     "test:coverage": "jest --coverage --runInBand",
     "test:all": "npm run test:unit && npm run test:integration"
   },

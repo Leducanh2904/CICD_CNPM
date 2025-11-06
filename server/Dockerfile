@@ -1,20 +1,18 @@
-# Sử dụng Node 20 nhỏ gọn
+# server/Dockerfile
 FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Chỉ copy file package để cache layer cài deps
+# chỉ copy package trước để cache layer
 COPY package*.json ./
-
-# Cài prod deps
+# cài deps production (loại devDeps)
 RUN npm ci --omit=dev
 
-# Copy source còn lại
+# copy toàn bộ source còn lại
 COPY . .
 
-# Render sẽ inject PORT, app đọc process.env.PORT
+ENV NODE_ENV=production
+# Render sẽ map PORT vào container, bạn chỉ cần lắng nghe process.env.PORT
 EXPOSE 10000
 
-# Chạy prod
-ENV NODE_ENV=production
-CMD ["npm", "start"]
+CMD ["node", "index.js"]

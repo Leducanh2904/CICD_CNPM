@@ -1,37 +1,38 @@
-# ---------- Stage 1: build CLIENT ----------
-FROM node:20 AS clientbuilder
+# ----- Stage 1: Build CLIENT -----
+FROM node:20-bullseye AS clientbuilder
 WORKDIR /app
 
-# Cài deps client
+# copy package trước để cache install
 COPY client/package*.json ./client/
-RUN cd client && npm ci
+# Dù NODE_ENV có là production đi nữa, vẫn buộc cài devDeps cho client
+RUN cd client && npm ci --include=dev
 
-# Build client
+# copy source client và build
 COPY client ./client
 RUN cd client && npm run build
 
-# ---------- Stage 2: install SERVER deps ----------
-FROM node:20 AS serverdeps
-WORKDIR /app/server
+# ----- Stage 2: Build SERVER (prod) -----
+FROM node:20-bullseye AS serverdeps
+WORKDIR /app
 
-COPY server/package*.json ./
-# Prod deps đủ dùng (nếu bạn cần devDeps thì bỏ --omit=dev)
-RUN npm ci --omit=dev
+COPY server/package*.json ./server/
+RUN cd server && npm ci --omit=dev
 
-# ---------- Stage 3: final runtime ----------
-FROM node:20
-ENV NODE_ENV=production
-WORKDIR /usr/src/app
+# ----- Stage 3: Runtime -----
+FROM node:20-bullseye
+WORKDIR /app
 
-# Copy server code và node_modules
-COPY --from=serverdeps /app/server/node_modules ./server/node_modules
+# Chỉ set ở stage chạy thực tế
+ENV NODE_ENV=production \
+    PORT=10000
+
+# copy server code
 COPY server ./server
+# copy deps đã cài sẵn
+COPY --from=serverdeps /app/server/node_modules ./server/node_modules
+# copy build client vào public
+COPY --from=clientbuilder /app/client/dist ./server/public
 
-# Copy build frontend vào image (để app.js serve từ ../client/dist)
-COPY --from=clientbuilder /app/client/dist ./client/dist
-
-# Render tự đặt PORT, đừng hardcode. EXPOSE chỉ là metadata, để 10000 cho hợp Render logs
 EXPOSE 10000
-
-# Chạy server
-CMD ["node", "server/index.js"]
+WORKDIR /app/server
+CMD ["node", "index.js"]

@@ -30,6 +30,9 @@ module.exports = {
   setupFiles: ["<rootDir>/server/jest/env.setup.js"],
   globalSetup: "<rootDir>/server/jest/globalSetup.js",
   globalTeardown: "<rootDir>/server/jest/globalTeardown.js",
+  moduleNameMapper: {
+    '^bcrypt$': require.resolve('bcryptjs'),
+  },
 };
 
 

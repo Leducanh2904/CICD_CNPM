@@ -1,17 +1,20 @@
-FROM node:18
+# Sử dụng Node 20 nhỏ gọn
+FROM node:20-alpine
 
-ENV NODE_ENV=production
 WORKDIR /usr/src/app
 
-# Cài đúng theo lockfile, bỏ devDeps để image nhẹ
+# Chỉ copy file package để cache layer cài deps
 COPY package*.json ./
+
+# Cài prod deps
 RUN npm ci --omit=dev
 
-# Copy code
+# Copy source còn lại
 COPY . .
 
-# Cổng mặc định (Render sẽ inject PORT, nhưng expose 8080 cho nhất quán)
-EXPOSE 8080
+# Render sẽ inject PORT, app đọc process.env.PORT
+EXPOSE 10000
 
-# Chạy production, KHÔNG dùng nodemon
+# Chạy prod
+ENV NODE_ENV=production
 CMD ["npm", "start"]

@@ -5,12 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
-    "test:watch": "cross-env NODE_ENV=test jest --verbose --runInBand --watch",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write ."
+    "dev": "cross-env NODE_ENV=development nodemon --legacy-watch index.js",
+    "test": "jest --runInBand"
   },
   "jest": {
     "testEnvironment": "node",

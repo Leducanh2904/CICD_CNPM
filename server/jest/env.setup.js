@@ -15,3 +15,13 @@ process.env.PGPASSWORD = process.env.PGPASSWORD || "newpassword";
 process.env.JWT_SECRET = process.env.JWT_SECRET || "testsecret";
 
 console.log("[SETUP] test env loaded via setupFiles");
+jest.mock('pino', () => {
+  // trả về "logger" giả có đủ API hay dùng
+  return () => ({
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+    child: jest.fn(() => ({ info: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() })),
+  });
+});

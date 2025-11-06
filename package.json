@@ -11,7 +11,7 @@
     "concurrently": "^7.6.0"
   },
   "scripts": {
-    "start": "node server/index.js",
+    "start": "node server",
     "server": "cd server && nodemon",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",

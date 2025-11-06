@@ -1,0 +1,75 @@
+# .github/workflows/monitor.yml
+name: Simple Monitoring
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # mỗi 10 phút
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TARGET_URL: https://YOUR-RENDER-URL/api/health   # <-- đổi URL thật
+      MAX_LATENCY_MS: "1500"
+    steps:
+      - name: Kiểm tra tình trạng website
+        id: check
+        run: |
+          echo "🔍 Checking $TARGET_URL..."
+          OUT=$(curl -sS -o /dev/null -w "%{http_code} %{time_total}" "$TARGET_URL" || echo "000 99")
+          CODE=$(echo "$OUT" | awk '{print $1}')
+          SECS=$(echo "$OUT" | awk '{print $2}')
+          MS=$(python - <<PYsec="$SECS"print(int(float(sec)*1000))PY)
+          echo "HTTP code: $CODE | latency: ${MS}ms"
+          echo "status=$CODE" >> $GITHUB_OUTPUT
+          echo "latency_ms=$MS" >> $GITHUB_OUTPUT
+
+          if [ "$CODE" != "200" ]; then
+            echo "::error::Website down (HTTP $CODE)"
+            exit 1
+          fi
+
+          if [ "$MS" -gt "$MAX_LATENCY_MS" ]; then
+            echo "::error::Latency too high (${MS}ms > ${MAX_LATENCY_MS}ms)"
+            exit 1
+          fi
+
+          echo "✅ Website healthy"
+
+      - name: Tạo Issue & gán owner khi FAIL (kích hoạt email GitHub Notifications)
+        if: failure()
+        uses: actions/github-script@v7
+        env:
+          TARGET_URL: ${{ env.TARGET_URL }}
+          STATUS: ${{ steps.check.outputs.status }}
+          LAT_MS: ${{ steps.check.outputs.latency_ms }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const title = `⚠️ Health check FAILED (HTTP ${process.env.STATUS})`;
+            const body = [
+              `URL: ${process.env.TARGET_URL}`,
+              `Status: ${process.env.STATUS}`,
+              `Latency: ${process.env.LAT_MS}ms`,
+              `Run: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+              ``,
+              `Ping: @${owner}`       // mention owner để kích hoạt email/notification
+            ].join('\n');
+            const res = await github.rest.issues.create({
+              owner, repo,
+              title,
+              body,
+              labels: ['monitoring', 'alert'],
+              assignees: [owner]      // assign cho owner để nhận email
+            });
+            core.info(`Created issue: ${res.data.html_url}`);
+
+      - name: Tổng kết
+        if: always()
+        run: |
+          echo "### Monitoring result" >> $GITHUB_STEP_SUMMARY
+          echo "- URL: ${{ env.TARGET_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ steps.check.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Latency: ${{ steps.check.outputs.latency_ms }} ms" >> $GITHUB_STEP_SUMMARY

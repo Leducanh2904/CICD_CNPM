@@ -31,8 +31,8 @@ app.use(unknownEndpoint);
 app.use(handleError);
 
 module.exports = app;
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
-app.use(require('./middleware/unKnownEndpoint'));
-app.use(require('./middleware/errorHandler'));
+// app.get('/api/health', (req, res) => {
+//   res.status(200).json({ status: 'ok' });
+// });
+// app.use(require('./middleware/unKnownEndpoint'));
+// app.use(require('./middleware/errorHandler'));

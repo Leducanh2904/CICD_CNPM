@@ -1,0 +1,50 @@
+name: Simple Monitoring
+
+on:
+  schedule:
+    - cron: "*/5 * * * *" # chạy mỗi 10 phút
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TARGET_URL: https://YOUR-RENDER-URL/api/health   # <-- đổi thành URL thật của bạn
+      MAX_LATENCY_MS: "1500"
+    steps:
+      - name: Kiểm tra tình trạng website
+        id: check
+        run: |
+          echo "🔍 Checking $TARGET_URL..."
+          OUT=$(curl -sS -o /dev/null -w "%{http_code} %{time_total}" "$TARGET_URL" || echo "000 99")
+          CODE=$(echo "$OUT" | awk '{print $1}')
+          SECS=$(echo "$OUT" | awk '{print $2}')
+          MS=$(python - <<PYsec="$SECS"print(int(float(sec)*1000))PY)
+          echo "HTTP code: $CODE | latency: ${MS}ms"
+          echo "status=$CODE" >> $GITHUB_OUTPUT
+          echo "latency_ms=$MS" >> $GITHUB_OUTPUT
+
+          if [ "$CODE" != "200" ]; then
+            echo "❌ Website down (HTTP $CODE)"
+            exit 1
+          fi
+
+          if [ "$MS" -gt "$MAX_LATENCY_MS" ]; then
+            echo "⚠️ Latency too high (${MS}ms > ${MAX_LATENCY_MS}ms)"
+            exit 1
+          fi
+
+          echo "✅ Website healthy"
+
+      - name: Ghi log ra GitHub Issues (tùy chọn)
+        if: failure()
+        uses: dacbd/create-issue-action@v1
+        with:
+          token: ${{ github.token }}
+          title: "⚠️ Health check FAILED"
+          body: |
+            URL: ${{ env.TARGET_URL }}
+            Status: ${{ steps.check.outputs.status }}
+            Latency: ${{ steps.check.outputs.latency_ms }}ms
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

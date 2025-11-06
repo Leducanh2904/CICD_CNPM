@@ -12,7 +12,7 @@ if (!isProd) {
       options: { colorize: true, translateTime: 'SYS:standard' },
     };
   } catch (e) {
-    // không có pino-pretty thì thôi, vẫn log bình thường
+    // không có pino-pretty thì thôi, vẫn log bình thườngaaaaaaaa
   }
 }
 

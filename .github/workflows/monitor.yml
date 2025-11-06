@@ -42,7 +42,7 @@ jobs:
             exit 1
           fi
 
-          echo "✅ Website healthy"
+          echo "✅ Website OK"
 
       - name: Ghi log ra GitHub Issues (tùy chọn)
         if: failure() && github.event_name != 'pull_request'

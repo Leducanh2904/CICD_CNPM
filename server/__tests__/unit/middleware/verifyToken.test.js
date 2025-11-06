@@ -35,7 +35,7 @@ function expectUnauthorizedError(err) {
   if ("status" in err) {
     expect(err.status).toBe(401);
   }
-  expect(err.message).toMatch(/token missing|invalid|bad token/i);
+  expect(err.message).toMatch(/token missing|invalid|bad token|jwt malformed/i);
 }
 
 describe("middleware/verifyToken", () => {

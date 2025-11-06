@@ -33,6 +33,7 @@ module.exports = {
   moduleNameMapper: {
     '^bcrypt$': require.resolve('bcryptjs'),
   },
+  setupFiles: ['<rootDir>/server/jest/env.setup.js'],
 };
 
 

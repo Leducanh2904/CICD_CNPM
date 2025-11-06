@@ -1,18 +1,37 @@
-# server/Dockerfile
-FROM node:20-alpine
+# ---------- Stage 1: build CLIENT ----------
+FROM node:20 AS clientbuilder
+WORKDIR /app
 
-WORKDIR /usr/src/app
+# Cài deps client
+COPY client/package*.json ./client/
+RUN cd client && npm ci
 
-# chỉ copy package trước để cache layer
-COPY package*.json ./
-# cài deps production (loại devDeps)
+# Build client
+COPY client ./client
+RUN cd client && npm run build
+
+# ---------- Stage 2: install SERVER deps ----------
+FROM node:20 AS serverdeps
+WORKDIR /app/server
+
+COPY server/package*.json ./
+# Prod deps đủ dùng (nếu bạn cần devDeps thì bỏ --omit=dev)
 RUN npm ci --omit=dev
 
-# copy toàn bộ source còn lại
-COPY . .
-
+# ---------- Stage 3: final runtime ----------
+FROM node:20
 ENV NODE_ENV=production
-# Render sẽ map PORT vào container, bạn chỉ cần lắng nghe process.env.PORT
+WORKDIR /usr/src/app
+
+# Copy server code và node_modules
+COPY --from=serverdeps /app/server/node_modules ./server/node_modules
+COPY server ./server
+
+# Copy build frontend vào image (để app.js serve từ ../client/dist)
+COPY --from=clientbuilder /app/client/dist ./client/dist
+
+# Render tự đặt PORT, đừng hardcode. EXPOSE chỉ là metadata, để 10000 cho hợp Render logs
 EXPOSE 10000
 
-CMD ["node", "index.js"]
+# Chạy server
+CMD ["node", "server/index.js"]

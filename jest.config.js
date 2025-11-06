@@ -22,6 +22,15 @@ module.exports = {
   setupFiles: ["<rootDir>/server/jest/env.setup.js"],
 };
 
+// jest.config.js (ở root)
+module.exports = {
+  testEnvironment: "node",
+  // Nếu bạn đã có config cho unit, chỉ cần chắc testMatch bắt được *.int.test.js
+  testMatch: ["**/__tests__/**/*.test.js", "**/__tests__/**/*.int.test.js"],
+  setupFiles: ["<rootDir>/server/jest/env.setup.js"],
+  globalSetup: "<rootDir>/server/jest/globalSetup.js",
+  globalTeardown: "<rootDir>/server/jest/globalTeardown.js",
+};
 
 
 

@@ -39,7 +39,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^6.8.0",
     "pg": "^8.8.0",
-    "pino": "^6.11.3",
+    "pino": "^6.14.0",
     "stripe": "^8.138.0",
     "swagger-ui-express": "^4.6.0"
   },

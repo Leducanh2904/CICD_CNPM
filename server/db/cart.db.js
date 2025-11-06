@@ -1,98 +1,130 @@
 const pool = require("../config");
 
 const createCartDb = async (userId) => {
-  const { rows: cart } = await pool.query(
-    "INSERT INTO cart(user_id) values($1) returning cart.id",
-    [userId]
-  );
-
-  return cart[0];
+  return { message: 'Cart ready', user_id: userId };
 };
 
 const getCartDb = async (userId) => {
-  // get cart items
-  const cart = await pool.query(
-    `SELECT products.*, cart_item.quantity, round((products.price * cart_item.quantity)::numeric, 2) as subtotal from users
-      join cart on users.user_id = cart.user_id
-      join cart_item on cart.id = cart_item.cart_id
-      join products on products.product_id = cart_item.product_id
-      where users.user_id = $1
-      `,
+  const { rows: cart } = await pool.query(
+    `SELECT 
+       c.id, c.user_id, c.product_id, c.quantity, c.created_at,
+       p.name, p.slug, p.price, p.stock, p.description, p.image_url,
+       ROUND((p.price * c.quantity)::numeric, 2) AS subtotal
+     FROM cart c
+     JOIN products p ON c.product_id = p.id
+     WHERE c.user_id = $1
+     ORDER BY c.created_at DESC`,
     [userId]
   );
-
-  return cart.rows;
+  return cart;
 };
 
-// add item to cart
-const addItemDb = async ({ cart_id, product_id, quantity }) => {
-  await pool.query(
-    `INSERT INTO cart_item(cart_id, product_id, quantity) 
-         VALUES($1, $2, $3) ON CONFLICT (cart_id, product_id) 
-        DO UPDATE set quantity = cart_item.quantity + 1 returning *`,
-    [cart_id, product_id, quantity]
-  );
+// addItemDb - FIXED: Table cart, ON CONFLICT (user_id, product_id), + quantity param
+const addItemDb = async ({ user_id, product_id, quantity = 1 }) => {
+  try {
+    const { rows: [result] } = await pool.query(
+      `INSERT INTO cart (user_id, product_id, quantity) 
+       VALUES ($1, $2, $3) 
+       ON CONFLICT (user_id, product_id) 
+       DO UPDATE SET quantity = cart.quantity + $3
+       RETURNING *`,
+      [user_id, product_id, quantity]
+    );
 
-  const results = await pool.query(
-    "Select products.*, cart_item.quantity, round((products.price * cart_item.quantity)::numeric, 2) as subtotal from cart_item join products on cart_item.product_id = products.product_id where cart_item.cart_id = $1",
-    [cart_id]
-  );
-
-  return results.rows;
+    // Return full cart sau add
+    return await getCartDb(user_id);
+  } catch (error) {
+    console.error('DB Error in addItemDb:', error);
+    throw error;
+  }
 };
 
-// delete item from cart
-const deleteItemDb = async ({ cart_id, product_id }) => {
-  const result = await pool.query(
-    "delete from cart_item where cart_id = $1 AND product_id = $2 returning *",
-    [cart_id, product_id]
-  );
-  return result.rows[0];
+// deleteItemDb - FIXED: Table cart, WHERE user_id + product_id
+const deleteItemDb = async ({ user_id, product_id }) => {
+  try {
+    const { rows: [result] } = await pool.query(
+      "DELETE FROM cart WHERE user_id = $1 AND product_id = $2 RETURNING *",
+      [user_id, product_id]
+    );
+    return result || null;
+  } catch (error) {
+    console.error('DB Error in deleteItemDb:', error);
+    throw error;
+  }
 };
 
-// increment item quantity by 1
-const increaseItemQuantityDb = async ({ cart_id, product_id }) => {
-  await pool.query(
-    "update cart_item set quantity = quantity + 1 where cart_item.cart_id = $1 and cart_item.product_id = $2",
-    [cart_id, product_id]
-  );
+// increaseItemQuantityDb - FIXED: Table cart, +1, return full cart
+const increaseItemQuantityDb = async ({ user_id, product_id }) => {
+  try {
+    const { rowCount } = await pool.query(
+      "UPDATE cart SET quantity = quantity + 1 WHERE user_id = $1 AND product_id = $2",
+      [user_id, product_id]
+    );
 
-  const results = await pool.query(
-    `Select products.*, cart_item.quantity, 
-       round((products.price * cart_item.quantity)::numeric, 2) as subtotal
-       from cart_item join products 
-       on cart_item.product_id = products.product_id 
-       where cart_item.cart_id = $1
-      `,
-    [cart_id]
-  );
-  return results.rows;
+    if (rowCount === 0) {
+      throw new Error('Item không tồn tại');
+    }
+
+    return await getCartDb(user_id);
+  } catch (error) {
+    console.error('DB Error in increaseItemQuantityDb:', error);
+    throw error;
+  }
 };
 
-// decrement item quantity by 1
-const decreaseItemQuantityDb = async ({ cart_id, product_id }) => {
-  await pool.query(
-    "update cart_item set quantity = quantity - 1 where cart_item.cart_id = $1 AND cart_item.product_id = $2 returning *",
-    [cart_id, product_id]
-  );
+// decreaseItemQuantityDb - FIXED: Table cart, -1 min 1, return full cart
+const decreaseItemQuantityDb = async ({ user_id, product_id }) => {
+  try {
+    const { rows: [result] } = await pool.query(
+      "UPDATE cart SET quantity = GREATEST(1, quantity - 1) WHERE user_id = $1 AND product_id = $2 RETURNING *",
+      [user_id, product_id]
+    );
 
-  const results = await pool.query(
-    "Select products.*, cart_item.quantity, round((products.price * cart_item.quantity)::numeric, 2) as subtotal from cart_item join products on cart_item.product_id = products.product_id where cart_item.cart_id = $1",
-    [cart_id]
-  );
-  return results.rows;
+    if (!result) {
+      throw new Error('Item không tồn tại');
+    }
+
+    return await getCartDb(user_id);
+  } catch (error) {
+    console.error('DB Error in decreaseItemQuantityDb:', error);
+    throw error;
+  }
 };
 
-const emptyCartDb = async (cartId) => {
-  return await pool.query("delete from cart_item where cart_id = $1", [cartId]);
+const emptyCartDb = async (userId) => {
+  try {
+    const { rowCount } = await pool.query(
+      "DELETE FROM cart WHERE user_id = $1",
+      [userId]
+    );
+    return { deleted: rowCount };
+  } catch (error) {
+    console.error('DB Error in emptyCartDb:', error);
+    throw error;
+  }
+};
+
+// THÊM MỚI: getCartCountDb - Đếm số items trong cart (cho check empty trước tạo order)
+const getCartCountDb = async (userId) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT COUNT(*) as count FROM cart WHERE user_id = $1',
+      [userId]
+    );
+    return parseInt(rows[0].count);
+  } catch (error) {
+    console.error('DB Error in getCartCountDb:', error);
+    throw error;
+  }
 };
 
 module.exports = {
   createCartDb,
   getCartDb,
   addItemDb,
+  deleteItemDb,
   increaseItemQuantityDb,
   decreaseItemQuantityDb,
-  deleteItemDb,
   emptyCartDb,
+  getCartCountDb,
 };

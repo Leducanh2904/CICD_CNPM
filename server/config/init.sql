@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(150) UNIQUE NOT NULL,
     password VARCHAR(200) NOT NULL,
     roles VARCHAR(50) DEFAULT 'user',
+    phone VARCHAR(20),
     account_status VARCHAR(20) DEFAULT 'active', 
     lock_reason TEXT, 
     unlock_reason TEXT, 

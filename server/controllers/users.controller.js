@@ -46,7 +46,7 @@ const getUserProfile = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { username, email, fullname, address, city, state, country } = req.body;
+  const { username, email, fullname, address, city, state, country, phone } = req.body;  // ✅ THÊM phone
   if (+req.params.id === req.user.id || req.user.roles.includes("admin")) {
     try {
       const results = await userService.updateUser({
@@ -57,6 +57,7 @@ const updateUser = async (req, res) => {
         city,
         state,
         country,
+        phone,  // ✅ THÊM phone pass to service
         id: req.params.id,
       });
       return res.status(201).json(results);

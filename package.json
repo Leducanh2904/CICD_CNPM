@@ -1,7 +1,9 @@
 {
+  "private": true,
   "name": "pern-store",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": { "node": ">=18" },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "concurrently": "^7.6.0"
@@ -11,15 +13,15 @@
     "server": "cd server && nodemon",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
+
     "test": "jest --runInBand",
     "test:unit": "jest server/__tests__/unit --runInBand --detectOpenHandles",
     "test:integration": "jest --config jest.config.js --runInBand",
+    "test:controllers": "jest server/__tests__/controllers --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
+
     "test:all": "npm run test:unit && npm run test:integration"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@testcontainers/postgresql": "^11.7.2",
     "dotenv": "^17.2.3",

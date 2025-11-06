@@ -1,17 +1,15 @@
 const pool = require("../config");
 
 const getReviewsDb = async ({ productId, userId }) => {
-  // check if current logged user review exist for the product
   const reviewExist = await pool.query(
     "SELECT EXISTS (SELECT * FROM reviews where product_id = $1 and user_id = $2)",
     [productId, userId]
   );
 
-  // get reviews associated with the product
   const reviews = await pool.query(
     `SELECT users.fullname as name, reviews.* FROM reviews
         join users 
-        on users.user_id = reviews.user_id
+        on users.id = reviews.user_id
         WHERE product_id = $1`,
     [productId]
   );

@@ -159,3 +159,5 @@ module.exports = {
   getAdminStats,
   getSellerStats,
 };
+module.exports.getAllOrders = module.exports.getAllOrders || module.exports.getOrders;
+

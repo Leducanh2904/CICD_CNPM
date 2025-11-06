@@ -57,7 +57,8 @@ getOrderBySeller = async (orderId, storeId) => {
       if (!order) {
         throw new ErrorHandler(404, "Order not found or not yours");
       }
-      return order;
+      order.password = undefined;
+      return order;  
     } catch (error) {
       console.error('Service Error in getOrderBySeller:', error);
       throw new ErrorHandler(error.statusCode || 500, error.message);

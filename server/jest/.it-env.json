@@ -1,9 +1,19 @@
 {
-  "NODE_ENV": "test",
+  "JWT_SECRET": "testsecret",
+  "DATABASE_URL": "postgres://testuser:testpass@localhost:32862/testdb",
   "PGHOST": "localhost",
-  "PGPORT": "5432",
-  "PGUSER": "postgres",
-  "PGDATABASE": "pernstore",
-  "PGPASSWORD": "newpassword",
-  "JWT_SECRET": "testsecret"
+  "PGPORT": "32862",
+  "PGUSER": "testuser",
+  "PGPASSWORD": "testpass",
+  "PGDATABASE": "testdb",
+  "DB_HOST": "localhost",
+  "DB_PORT": "32862",
+  "DB_USER": "testuser",
+  "DB_PASSWORD": "testpass",
+  "DB_NAME": "testdb",
+  "DATABASE_HOST": "localhost",
+  "DATABASE_PORT": "32862",
+  "DATABASE_USER": "testuser",
+  "DATABASE_PASSWORD": "testpass",
+  "DATABASE_NAME": "testdb"
 }

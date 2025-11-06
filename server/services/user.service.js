@@ -10,19 +10,21 @@ const {
   getUserByUsernameDb,
   getUsersByRoleDb,  
   getTotalUsersDb,
-  updateStatusDb,  // Existing
-  getSellersWithoutStoreDb,  // ✅ Thêm import nếu chưa có
+  updateStatusDb,
+  getSellersWithoutStoreDb,
 } = require("../db/user.db");
 const { ErrorHandler } = require("../helpers/error");
 
 class UserService {
   createUser = async (user) => {
     try {
-      return await createUserDb(user);
+      const { username, hashedPassword, email, fullname, phone } = user;  // ✅ THÊM phone
+      return await createUserDb({ username, hashedPassword, email, fullname, phone });  // ✅ THÊM phone
     } catch (error) {
       throw new ErrorHandler(error.statusCode, error.message);
     }
   };
+
   getUserByEmail = async (email) => {
     try {
       const user = await getUserByEmailDb(email);
@@ -31,6 +33,7 @@ class UserService {
       throw new ErrorHandler(error.statusCode, error.message);
     }
   };
+
   getUserByUsername = async (username) => {
     try {
       const user = await getUserByUsernameDb(username);
@@ -39,6 +42,7 @@ class UserService {
       throw new ErrorHandler(error.statusCode, error.message);
     }
   };
+
   getUserById = async (id) => {
     try {
       const user = await getUserByIdDb(id);
@@ -50,6 +54,7 @@ class UserService {
       throw new ErrorHandler(error.statusCode, error.message);
     }
   };
+
   createGoogleAccount = async (user) => {
     try {
       return await createUserGoogleDb(user);
@@ -57,6 +62,7 @@ class UserService {
       throw new ErrorHandler(error.statusCode, error.message);
     }
   };
+
   changeUserPassword = async (password, email) => {
     try {
       return await changeUserPasswordDb(password, email);
@@ -64,17 +70,16 @@ class UserService {
       throw new ErrorHandler(error.statusCode, error.message);
     }
   };
+
   updateUser = async (user) => {
-    const { email, username, id } = user;
+    const { email, username, id, address, city, state, country, phone } = user;  // ✅ THÊM phone
     const errors = {};
     try {
       const getUser = await getUserByIdDb(id);
       const findUserByEmail = await getUserByEmailDb(email);
       const findUserByUsername = await getUserByUsernameDb(username);
-      const emailChanged =
-        email && getUser.email.toLowerCase() !== email.toLowerCase();
-      const usernameChanged =
-        username && getUser.username.toLowerCase() !== username.toLowerCase();
+      const emailChanged = email && getUser.email.toLowerCase() !== email.toLowerCase();
+      const usernameChanged = username && getUser.username.toLowerCase() !== username.toLowerCase();
 
       if (emailChanged && typeof findUserByEmail === "object") {
         errors["email"] = "Email is already taken";
@@ -87,7 +92,7 @@ class UserService {
         throw new ErrorHandler(403, errors);
       }
 
-      return await updateUserDb(user);
+      return await updateUserDb({ username, email, fullname: user.fullname, address, city, state, country, phone, id });  // ✅ THÊM phone
     } catch (error) {
       throw new ErrorHandler(error.statusCode, error.message);
     }
@@ -101,15 +106,15 @@ class UserService {
     }
   };
 
-getAllUsers = async () => {
-  try {
-    let results = await getAllUsersDb(); 
-    results = results.filter(user => user.roles !== 'admin');
-    return results;
-  } catch (error) {
-    throw new ErrorHandler(error.statusCode || 500, error.message);
-  }
-};
+  getAllUsers = async () => {
+    try {
+      let results = await getAllUsersDb();
+      results = results.filter(user => user.roles !== 'admin');
+      return results;
+    } catch (error) {
+      throw new ErrorHandler(error.statusCode || 500, error.message);
+    }
+  };
 
   getUsersByRole = async (role) => {
     try {
@@ -141,7 +146,6 @@ getAllUsers = async () => {
         lockReason: status === 'locked' ? reason : null,
         unlockReason: status === 'active' ? reason : null,
       });
-      // Hide sensitive fields
       updatedUser.password = undefined;
       updatedUser.google_id = undefined;
       updatedUser.cart_id = undefined;
@@ -151,7 +155,6 @@ getAllUsers = async () => {
     }
   };
 
-  // ✅ THÊM: Method này VÀO TRONG class (indent 2 spaces, trước } đóng class)
   getSellersWithoutStore = async () => {
     try {
       return await getSellersWithoutStoreDb();
@@ -159,6 +162,6 @@ getAllUsers = async () => {
       throw new ErrorHandler(error.statusCode || 500, error.message);
     }
   };
-}  // ✅ Đóng class SAU method mới
+}
 
 module.exports = new UserService();

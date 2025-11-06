@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      TARGET_URL: https://YOUR-RENDER-URL/api/health   # <-- đổi thành URL thật của bạn
+      TARGET_URL: https://cicd-cnpm-1.onrender.com/api/health   # <-- đổi thành URL thật của bạn
       MAX_LATENCY_MS: "1500"
     steps:
       - name: Kiểm tra tình trạng website

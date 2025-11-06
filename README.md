@@ -8,26 +8,14 @@ A full-stack e-commerce project built with Postgres, Express, React and Node.
 
 ## Swagger API Documentation
 
-[Documentation](https://pern-store.onrender.com/api/docs/)
-
-## Demo
-
-[Run demo](https://pern-store.netlify.app)
-
-## Screenshots
-
-![Homepage Screen Shot](https://user-images.githubusercontent.com/51405947/104136952-a3509100-5399-11eb-94a6-0f9b07fbf1a2.png)
-
-## Database Schema
-
-[![ERD](https://user-images.githubusercontent.com/51405947/133893279-8872c475-85ff-47c4-8ade-7d9ef9e5325a.png)](https://dbdiagram.io/d/5fe320fa9a6c525a03bc19db)
+[Documentation](https://cicd-cnpm-1.onrender.com/api/docs/)
 
 ## Run Locally
 
 Clone the project
 
 ```bash
-  git clone https://github.com/dhatguy/PERN-Store.git
+  git clone https://github.com/Leducanh2904/CICD_CNPM
 ```
 
 Go to the project directory
@@ -120,9 +108,6 @@ To run this project, you will need to add the following environment variables to
 
 #### client/.env
 
-`VITE_GOOGLE_CLIENT_ID`
-
-`VITE_GOOGLE_CLIENT_SECRET`
 
 `VITE_API_URL`
 
@@ -146,24 +131,3 @@ To run this project, you will need to add the following environment variables to
 
 `SECRET`
 
-`REFRESH_SECRET`
-
-`SMTP_FROM`
-
-`STRIPE_SECRET_KEY`
-
-## Contributing
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## Feedback
-
-Joseph Odunsi - [@odunsi](https://twitter.com/_odunsi_) - odunsiolakunbi@gmail.com
-
-Project Link: [https://github.com/dhatguy/PERN-Store](https://github.com/dhatguy/PERN-Store)
-
-Demo Link: [https://pern-store.netlify.app](https://pern-store.netlify.app)

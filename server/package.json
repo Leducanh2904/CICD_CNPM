@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "cross-env NODE_ENV=development nodemon --legacy-watch index.js",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "build": "node ./node_modules/vite/bin/vite.js build"
   },
   "jest": {
     "testEnvironment": "node",

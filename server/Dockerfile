@@ -1,38 +1,45 @@
-# ----- Stage 1: Build CLIENT -----
-FROM node:20-bullseye AS clientbuilder
-WORKDIR /app
+# -------- Stage 1: Build CLIENT (Vite) --------
+FROM node:20 AS clientbuilder
+WORKDIR /app/client
 
-# copy package trước để cache install
-COPY client/package*.json ./client/
-# Dù NODE_ENV có là production đi nữa, vẫn buộc cài devDeps cho client
-RUN cd client && npm ci --include=dev
+# Chỉ copy file khai báo để cache install
+COPY ../client/package*.json ./
+RUN npm ci
 
-# copy source client và build
-COPY client ./client
-RUN cd client && npm run build
+# Copy source client sau
+COPY ../client ./
 
-# ----- Stage 2: Build SERVER (prod) -----
-FROM node:20-bullseye AS serverdeps
-WORKDIR /app
+# (Tuỳ chọn) strip CRLF trong vite.js nếu bạn muốn đảm bảo tuyệt đối
+# RUN sed -i 's/\r$//' node_modules/vite/bin/vite.js
 
-COPY server/package*.json ./server/
-RUN cd server && npm ci --omit=dev
+# Build bằng script đã sửa ở bước (1)
+RUN npm run build
 
-# ----- Stage 3: Runtime -----
-FROM node:20-bullseye
-WORKDIR /app
-
-# Chỉ set ở stage chạy thực tế
-ENV NODE_ENV=production \
-    PORT=10000
-
-# copy server code
-COPY server ./server
-# copy deps đã cài sẵn
-COPY --from=serverdeps /app/server/node_modules ./server/node_modules
-# copy build client vào public
-COPY --from=clientbuilder /app/client/dist ./server/public
-
-EXPOSE 10000
+# -------- Stage 2: Install SERVER deps (prod) --------
+FROM node:20 AS serverdeps
 WORKDIR /app/server
+
+# Cài deps production của server
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Copy toàn bộ server source
+COPY . .
+
+# -------- Stage 3: Runtime --------
+FROM node:20
+ENV NODE_ENV=production
+WORKDIR /app/server
+
+# Copy server (code + node_modules)
+COPY --from=serverdeps /app/server /app/server
+
+# Copy client build thành static cho backend phục vụ
+# client/dist -> server/public
+COPY --from=clientbuilder /app/client/dist /app/server/public
+
+# Render sẽ gán PORT (thường 10000)
+EXPOSE 10000
+
+# Start server (index.js của bạn đã listen PORT đúng chứ?)
 CMD ["node", "index.js"]

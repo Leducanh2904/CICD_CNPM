@@ -1,15 +1,17 @@
-# -------- Stage 1: Build CLIENT (Vite) --------
+# -------- Stage 1: BUILD CLIENT (Vite) --------
 FROM node:20 AS clientbuilder
 WORKDIR /app/client
 
-# copy theo path từ repo root (context = .)
 COPY client/package*.json ./
 RUN npm ci
 
 COPY client ./
-# nếu đã sửa script build thành npx/node như đã hướng dẫn trước đó:
-RUN npm run build
-# hoặc: RUN npx vite build
+
+# Normalize CRLF đề phòng và gọi vite qua Node để tránh Permission denied
+RUN sed -i 's/\r$//' node_modules/vite/bin/vite.js || true \
+    && sed -i 's/\r$//' node_modules/.bin/vite || true \
+    && node node_modules/vite/bin/vite.js build
+
 
 # -------- Stage 2: Install SERVER deps (prod) --------
 FROM node:20 AS serverdeps

@@ -14,17 +14,7 @@ const OrderDetails = () => {
   const [error, setError] = useState(null);
 
   // Base URL cho images từ backend
-  const getBackendBase = () => {
-    if (import.meta.env.PROD) {
-      const env = import.meta.env.VITE_API_URL || '';
-      if (env) return env.replace(/\/api\/?$/, '').replace(/\/$/, '');
-      if (typeof window !== 'undefined') return window.location.origin;
-      return '';
-    }
-    return 'http://localhost:10000';
-  };
-
-  const BASE_IMAGE_URL = getBackendBase();
+  const BASE_IMAGE_URL = 'http://localhost:10000';
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -87,8 +77,8 @@ const OrderDetails = () => {
         <p>Placed on: {formattedDate}</p>
         <div className="border-t-2">
           <h1 className="font-bold text-xl">Items in your order</h1>
-          {Array.isArray(items) && items.length > 0 ? (
-            (Array.isArray(items) ? items : []).map((item) => (
+          {items.length > 0 ? (
+            items.map((item) => (
               <Card key={item.id || item.product_id} className="flex my-4 p-2 md:flex-row flex-col">
                 <img
                   className="sm:w-full md:w-1/2 lg:w-1/3 object-contain md:object-cover"

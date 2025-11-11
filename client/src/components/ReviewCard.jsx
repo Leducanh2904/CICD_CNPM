@@ -3,7 +3,7 @@ import { format, parseISO } from "date-fns";
 import ReactStars from "react-rating-stars-component";
 
 const ReviewCard = ({ reviews }) => {
-  if (!Array.isArray(reviews) || reviews.length === 0) {
+  if (reviews.length === 0) {
     return (
       <div>
         <p>No reviews yet</p>

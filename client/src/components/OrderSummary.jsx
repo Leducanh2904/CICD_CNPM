@@ -6,7 +6,7 @@ const OrderSummary = ({ baseImageUrl = '' }) => {
   return (
     <div>
       <h1 className="text-xl font-medium">Order Summary</h1>
-  {(Array.isArray(cartData?.items) ? cartData.items : []).map((item) => (
+      {cartData?.items.map((item) => (
         <div key={item.product_id} className="flex border-b-2 py-2 space-x-2">
           <img
             className="w-2/5"

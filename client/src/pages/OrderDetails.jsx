@@ -87,8 +87,8 @@ const OrderDetails = () => {
         <p>Placed on: {formattedDate}</p>
         <div className="border-t-2">
           <h1 className="font-bold text-xl">Items in your order</h1>
-          {items.length > 0 ? (
-            items.map((item) => (
+          {Array.isArray(items) && items.length > 0 ? (
+            (Array.isArray(items) ? items : []).map((item) => (
               <Card key={item.id || item.product_id} className="flex my-4 p-2 md:flex-row flex-col">
                 <img
                   className="sm:w-full md:w-1/2 lg:w-1/3 object-contain md:object-cover"

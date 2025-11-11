@@ -124,7 +124,7 @@ export default function SellerMenu() {
               </tr>
             </thead>
             <tbody>
-              {menuItems.map(item => (
+                  {(Array.isArray(menuItems) ? menuItems : []).map(item => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="border p-2 font-medium">{item.name}</td>
                   <td className="border p-2">{formatCurrency(item.price)}</td>

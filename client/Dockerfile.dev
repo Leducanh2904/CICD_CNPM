@@ -1,11 +1,11 @@
-FROM node:16
+FROM node:18
 
 WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
 
 COPY . .
 
-RUN npm i --no-audit || npm i --no-audit --maxsockets 1
-
-EXPOSE 3000
-
-CMD [ "yarn", "start" ]
+EXPOSE 5173
+# cho phép truy cập từ host
+CMD ["npm","run","dev","--","--host","0.0.0.0"]

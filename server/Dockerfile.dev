@@ -1,11 +1,13 @@
-FROM node:16
+FROM node:20
 
-WORKDIR /usr/src/app
+WORKDIR /app
+# cài deps nhanh & cache tốt
+COPY package*.json ./
+RUN npm ci
 
+# copy mã nguồn
 COPY . .
 
-RUN npm i --no-audit || npm i --no-audit --maxsockets 1
-
-EXPOSE 9000
-
-CMD [ "npm", "run", "dev" ]
+ENV NODE_ENV=development
+EXPOSE 10000
+CMD ["npm","run","dev"]

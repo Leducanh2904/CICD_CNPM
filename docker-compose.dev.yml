@@ -1,12 +1,8 @@
-version: "3.8"
-
 services:
   database:
     container_name: pern-store-db
-    image: postgres:15
+    image: postgres:16
     restart: always
-    env_file:
-      - ./server/.env
     environment:
       POSTGRES_DB: pernstore
       POSTGRES_USER: postgres
@@ -16,59 +12,54 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
       - ./server/config/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - pernstore
+    networks: [pernstore]
 
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev        # <-- dùng file dev
     container_name: pern-store-server
     restart: unless-stopped
-    env_file:
-      - ./server/.env
     environment:
-      POSTGRES_HOST: database
+      NODE_ENV: development
+      PORT: 10000
+      # dùng connection string cho đơn giản
+      DATABASE_URL: postgres://postgres:newpassword@database:5432/pernstore
     volumes:
-      - ./server:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./server:/app
+      - /app/node_modules
+    depends_on: [database]
     ports:
-      - "9000:9000"
-    depends_on:
-      - database
-    networks:
-      - pernstore
+      - "10000:10000"
+    networks: [pernstore]
 
   client:
     build:
       context: ./client
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev        # <-- dùng file dev
     container_name: pern-store-client
     restart: unless-stopped
-    env_file:
-      - ./client/.env
+    environment:
+      # để axios đọc được baseURL khi dev
+      VITE_API_URL: http://localhost:10000
     volumes:
       - ./client:/usr/src/app
       - /usr/src/app/node_modules
+    depends_on: [server]
     ports:
-      - "3001:3000"
-    depends_on:
-      - server
-    networks:
-      - pernstore
+      - "5173:3000"
+    networks: [pernstore]
 
   pgadmin:
     image: dpage/pgadmin4
     container_name: pern-store-pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: "admin@mail.com"
-      PGADMIN_DEFAULT_PASSWORD: "admin123"
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
       - "16543:80"
-    depends_on:
-      - database
-    networks:
-      - pernstore
+    depends_on: [database]
+    networks: [pernstore]
 
 networks:
   pernstore:

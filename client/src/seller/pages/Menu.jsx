@@ -31,7 +31,7 @@ export default function SellerMenu() {
     };
     fetchStore();
   }, []);
-  const BASE_IMAGE_URL = 'http://localhost:9000';
+  const BASE_IMAGE_URL = 'http://localhost:10000';
   const load = async (page = 1) => {
     if (!storeId) return;
     setLoading(true);

@@ -14,7 +14,7 @@ const OrderDetails = () => {
   const [error, setError] = useState(null);
 
   // Base URL cho images từ backend
-  const BASE_IMAGE_URL = 'http://localhost:9000';
+  const BASE_IMAGE_URL = 'http://localhost:10000';
 
   useEffect(() => {
     const fetchOrder = async () => {

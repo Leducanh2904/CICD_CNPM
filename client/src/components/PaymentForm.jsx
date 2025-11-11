@@ -18,7 +18,7 @@ const PaymentForm = ({ previousStep, addressData }) => {
   const navigate = useNavigate();
 
   // Base URL cho images từ backend (dùng cho OrderSummary nếu cần pass down)
-  const BASE_IMAGE_URL = 'http://localhost:9000';
+  const BASE_IMAGE_URL = 'http://localhost:10000';
 
   const createQR = async () => {
     setError(null);

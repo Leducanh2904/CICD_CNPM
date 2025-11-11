@@ -53,10 +53,10 @@ const ProductDetails = () => {
       // Fallback nếu không có ảnh (tạo file placeholder.jpg ở src/public nếu cần)
       return 'https://via.placeholder.com/400x400?text=No+Image';  // Placeholder online tạm thời
     }
-    // Dev: localhost:9000; Prod: từ env VITE_API_URL (bỏ /api)
+    // Dev: localhost:10000; Prod: từ env VITE_API_URL (bỏ /api)
     const baseUrl = import.meta.env.PROD 
       ? import.meta.env.VITE_API_URL.replace('/api', '')  // Ví dụ: https://api.example.com → https://example.com
-      : 'http://localhost:9000';
+      : 'http://localhost:10000';
     return `${baseUrl}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
   };
 

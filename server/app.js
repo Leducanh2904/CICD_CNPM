@@ -1,37 +1,53 @@
 // server/app.js
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
 const routes = require("./routes");
 const unknownEndpoint = require("./middleware/unKnownEndpoint");
 
-const app = express();
+const app = express(); // 🟢 KHỞI TẠO app TRƯỚC
+
+// --- CORS ---
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+app.use(cors({
+  origin(origin, cb) {
+    // Cho phép request không có Origin (curl, healthcheck)
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}));
+app.options("*", cors()); // preflight
+
+app.use(express.json());
 app.use(express.json());
 
-// Health check cho Render
+// 🟢 Health check (Render sẽ gọi để kiểm tra container)
 app.get("/api/health", (_req, res) => res.status(200).send("ok"));
 app.head("/api/health", (_req, res) => res.sendStatus(200));
 
-// API mount dưới /api
+// 🟢 Mount API routes
 app.use("/api", routes);
 
-// (nếu có ảnh upload) phục vụ thư mục ảnh tĩnh
+// 🟢 Phục vụ ảnh tĩnh (upload)
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 
-// ---- Serve frontend build (Vite/React) ----
+// 🟢 Khi chạy production: serve React build (dist)
 const clientDist = path.resolve(__dirname, "public");
-
-// Phục vụ static assets (JS/CSS/img)
 app.use(express.static(clientDist));
 
-// Fallback tất cả route còn lại về index.html (cho SPA router)
+// 🟢 Tất cả route còn lại (ngoài /api) sẽ load index.html (cho React Router)
 app.get("*", (req, res, next) => {
-  // Nếu vô tình lọt yêu cầu /api/* tới đây (do không khớp route),
-  // để unknownEndpoint xử lý.
   if (req.path.startsWith("/api/")) return next();
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
-// Unknown endpoint cho /api/*
+// 🟢 Middleware xử lý endpoint không tồn tại (404)
 app.use(unknownEndpoint);
 
 module.exports = app;

@@ -12,7 +12,7 @@ const Product = ({ product }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Lấy API_URL từ .env
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:9000";
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
 
   const addToCart = async (e) => {
     e.preventDefault();

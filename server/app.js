@@ -18,7 +18,7 @@ app.use("/api", routes);
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 
 // ---- Serve frontend build (Vite/React) ----
-const clientDist = path.resolve(__dirname, "../client/dist");
+const clientDist = path.resolve(__dirname, "public");
 
 // Phục vụ static assets (JS/CSS/img)
 app.use(express.static(clientDist));

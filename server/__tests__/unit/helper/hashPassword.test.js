@@ -3,13 +3,13 @@
  * - Mock async bcrypt-like API: genSalt, hash, compare
  * - Use await
  */
-jest.mock("bcrypt", () => ({
-  genSalt: jest.fn(async () => "salt"),
-  hash: jest.fn(async (plain, salt) => `hashed(${plain})`),
-  compare: jest.fn(async (plain, hashed) => hashed === `hashed(${plain})`),
+jest.mock('bcryptjs', () => ({
+  genSalt: jest.fn(async () => 'salt'),
+  hash: jest.fn(async (pwd, salt) => `hashed:${pwd}:${salt}`),
+  compare: jest.fn(async (pwd, hash) => hash === `hashed:${pwd}:salt`)
 }));
+const bcrypt = require('bcryptjs');
 
-const bcrypt = require("bcrypt");
 const { hashPassword, comparePassword } = require("../../../helpers/hashPassword");
 
 describe("helpers/hashPassword (async)", () => {

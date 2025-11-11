@@ -2,7 +2,8 @@ const supertest = require("supertest");
 const app = require("../../app");
 const api = supertest(app);
 const pool = require("../../config");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+
 
 beforeAll(async () => {
   await pool.query("DELETE FROM users");

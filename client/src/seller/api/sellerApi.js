@@ -1,18 +1,6 @@
 import axios from "axios";
 
-function getBackendOrigin() {
-  if (import.meta.env.PROD) {
-    const env = import.meta.env.VITE_API_URL || '';
-    if (env) return env.replace(/\/api\/?$/, '').replace(/\/$/, '');
-    if (typeof window !== 'undefined') return window.location.origin;
-    return '';
-  }
-  return 'http://localhost:10000';
-}
-
-const API_URL = getBackendOrigin();
-// eslint-disable-next-line no-console
-console.debug('[SellerAPI] baseURL resolved to', API_URL);
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
 
 const sellerApi = axios.create({
   baseURL: API_URL,

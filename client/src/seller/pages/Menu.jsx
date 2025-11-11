@@ -31,17 +31,7 @@ export default function SellerMenu() {
     };
     fetchStore();
   }, []);
-  const getBackendBase = () => {
-    if (import.meta.env.PROD) {
-      const env = import.meta.env.VITE_API_URL || '';
-      if (env) return env.replace(/\/api\/?$/, '').replace(/\/$/, '');
-      if (typeof window !== 'undefined') return window.location.origin;
-      return '';
-    }
-    return 'http://localhost:10000';
-  };
-
-  const BASE_IMAGE_URL = getBackendBase();
+  const BASE_IMAGE_URL = 'http://localhost:10000';
   const load = async (page = 1) => {
     if (!storeId) return;
     setLoading(true);
@@ -124,7 +114,7 @@ export default function SellerMenu() {
               </tr>
             </thead>
             <tbody>
-                  {(Array.isArray(menuItems) ? menuItems : []).map(item => (
+              {menuItems.map(item => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="border p-2 font-medium">{item.name}</td>
                   <td className="border p-2">{formatCurrency(item.price)}</td>

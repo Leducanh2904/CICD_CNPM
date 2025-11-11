@@ -12,8 +12,7 @@ const handleLogout = () => {
   document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   
   setTimeout(() => {
-    // use navigate to redirect relative to current host instead of hardcoded dev host
-    navigate('/login');
+  window.location.href = "http://localhost:5173/login";
   }, 100 );
 };
 

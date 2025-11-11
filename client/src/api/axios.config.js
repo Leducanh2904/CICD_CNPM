@@ -1,8 +1,17 @@
+// client/src/api/axios.config.js
 import axios from "axios";
 
-const baseURL = import.meta.env.PROD
-  ? import.meta.env.VITE_API_URL
-  : "http://localhost:10000/api";
+const isProd = import.meta.env.PROD;
+
+// Origin cho dev và ảnh
+const devOrigin =
+  (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.replace(/\/$/, "")) ||
+  "http://localhost:10000";
+
+// Base URL cho axios
+const baseURL = isProd
+  ? `${window.location.origin}/api`   // Render: same-origin → không mixed-content
+  : `${devOrigin}/api`;               // Local dev
 
 const API = axios.create({
   baseURL,
@@ -10,19 +19,15 @@ const API = axios.create({
 });
 
 API.interceptors.request.use(
-  function (req) {
-    const token = localStorage.getItem("token"); // chuỗi JWT
-    if (token) {
-      req.headers["auth-token"] = token;
-      // console.log("🔑 Attached token:", token);
-    } else {
-      // console.warn("⚠️ No token found in localStorage");
-    }
+  (req) => {
+    const token = localStorage.getItem("token");
+    if (token) req.headers["auth-token"] = token;
     return req;
   },
-  function (error) {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default API;
+
+// Nếu nơi khác cần origin để load ảnh (ví dụ /images/xxx):
+export const API_ORIGIN = isProd ? window.location.origin : devOrigin;

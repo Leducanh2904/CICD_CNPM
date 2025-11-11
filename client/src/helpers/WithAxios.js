@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import API from "api/axios.config";
 import { useUser } from "context/UserContext";
 import history from "helpers/history";
-
+import { normalizeToken } from "helpers/token";
 const WithAxios = ({ children }) => {
   const { setIsLoggedIn, setUserData, setAuthData, isLoggedIn } = useUser();
 
@@ -26,7 +26,13 @@ const WithAxios = ({ children }) => {
             try {
               originalRequest._retry = true;
               const res = await API.post("/auth/refresh-token");
-              localStorage.setItem("token", JSON.stringify(res.data.token));
+              const normalizedToken = normalizeToken(res.data?.token);
+              if (normalizedToken) {
+                localStorage.setItem("token", normalizedToken);
+                setAuthData({ token: normalizedToken });
+              } else {
+                localStorage.removeItem("token");
+              }
               return API(originalRequest);
             } catch (error) {
               localStorage.removeItem("token");

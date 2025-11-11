@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { decodeTokenPayload, normalizeToken } from "helpers/token";
 import AdminAPI, { getSellersWithoutStore } from "../api/adminApi";  // ✅ Import function mới
 
 export default function StoreForm({ onSaved, initial = null, onCancel }) {
@@ -15,7 +16,7 @@ export default function StoreForm({ onSaved, initial = null, onCancel }) {
 
   // Check token on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = normalizeToken(localStorage.getItem("token"));
     if (!token) {
       setAuthError("Please login as admin to load sellers.");
       setFetchingSellers(false);
@@ -23,11 +24,11 @@ export default function StoreForm({ onSaved, initial = null, onCancel }) {
       return;
     }
     // Log token payload để verify role/exp
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+    const payload = decodeTokenPayload(token);
+    if (payload) {
       console.log("🔍 Token Payload:", payload);  // Should show roles: "admin", exp not expired
-    } catch (decodeErr) {
-      console.error("❌ Cannot decode token:", decodeErr);
+    } else {
+      console.warn("⚠️ Unable to decode admin token payload");
     }
     console.log("✅ Token found, proceeding to fetch sellers");
   }, []);

@@ -2,7 +2,7 @@ import API from "api/axios.config";
 import WithAxios from "helpers/WithAxios";
 import { createContext, useContext, useEffect, useState } from "react";
 import authService from "services/auth.service";
-
+import { normalizeToken } from "helpers/token";
 const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
@@ -17,10 +17,10 @@ const UserProvider = ({ children }) => {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+    const storedToken = normalizeToken(localStorage.getItem("token"));
     if (storedToken) {
       setIsLoggedIn(true);
-      setAuthData({ token: storedToken }); // ✅ giữ raw string
+      setAuthData({ token: storedToken });
     }
   }, []);
 
@@ -39,11 +39,16 @@ const UserProvider = ({ children }) => {
 
   const setUserInfo = (data) => {
     const { user, token } = data;
+    const normalizedToken = normalizeToken(token);
     setIsLoggedIn(true);
     setUserData(user);
-    setAuthData({ token });
+    setAuthData({ token: normalizedToken });
 
-    localStorage.setItem("token", token); // ✅ lưu raw string, không JSON.stringify
+    if (normalizedToken) {
+      localStorage.setItem("token", normalizedToken);
+    } else {
+      localStorage.removeItem("token");
+    }
   };
 
   const logout = () => {

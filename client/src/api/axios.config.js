@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { normalizeToken } from "helpers/token";
 const baseURL = import.meta.env.PROD
   ? import.meta.env.VITE_API_URL
   : "http://localhost:10000/api";
@@ -11,7 +11,7 @@ const API = axios.create({
 
 API.interceptors.request.use(
   function (req) {
-    const token = localStorage.getItem("token"); // chuỗi JWT
+    const token = normalizeToken(localStorage.getItem("token"));
     if (token) {
       req.headers["auth-token"] = token;
       // console.log("🔑 Attached token:", token);

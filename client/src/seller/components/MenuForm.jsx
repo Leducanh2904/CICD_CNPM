@@ -1,5 +1,6 @@
 import { useState } from "react";
-import sellerApi from "../api/sellerApi";  
+import { normalizeToken } from "helpers/token";
+import sellerApi from "../api/sellerApi";
 
 export default function MenuForm({ onSaved, initial = null, onCancel, storeId }) {
   const [name, setName] = useState(initial?.name || "");
@@ -12,7 +13,7 @@ export default function MenuForm({ onSaved, initial = null, onCancel, storeId })
 
 const submit = async (e) => {
   e.preventDefault();
-  const token = localStorage.getItem("token");
+  const token = normalizeToken(localStorage.getItem("token"));
   if (!token) {
     alert("Please login as seller to save menu item.");
     return;

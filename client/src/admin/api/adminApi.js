@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { normalizeToken } from "helpers/token";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
 
 const adminApi = axios.create({
@@ -8,7 +8,7 @@ const adminApi = axios.create({
 });
 
 adminApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = normalizeToken(localStorage.getItem("token"));
   if (token) {
     config.headers["auth-token"] = token;
     console.log("🔑 AdminAPI: Attached plain auth-token for", config.url);

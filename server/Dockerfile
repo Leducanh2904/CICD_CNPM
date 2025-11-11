@@ -8,21 +8,19 @@ COPY client ./
 RUN sed -i 's/\r$//' node_modules/vite/bin/vite.js || true \
  && sed -i 's/\r$//' node_modules/.bin/vite || true \
  && node node_modules/vite/bin/vite.js build
-
 # -------- Stage 2: Install SERVER deps (prod) --------
 FROM node:20 AS serverdeps
 WORKDIR /app/server
 
-# Cài deps theo lockfile
+# Cài deps theo lockfile (đÃ đổi bcrypt -> bcryptjs trong package.json)
 COPY server/package*.json ./
 RUN npm ci --omit=dev
 
-# Copy mã nguồn server (đÃ CHẶN node_modules bằng .dockerignore)
+# Copy mã nguồn server (node_modules đã bị .dockerignore chặn, tốt)
 COPY server ./
 
-# Xóa mọi dấu vết bcrypt cũ (nếu vô tình bị copy) và build lại cho Linux
-RUN rm -rf node_modules/bcrypt \
- && npm install bcrypt --build-from-source
+# ❌ BỎ HOÀN TOÀN dòng ép cài bcrypt native
+# RUN rm -rf node_modules/bcrypt && npm install bcrypt --build-from-source
 
 # -------- Stage 3: Runtime --------
 FROM node:20

@@ -1,13 +1,9 @@
 import axios from "axios";
 
-// 🟢 Nếu đang chạy production (Render), dùng domain thật
-// 🟡 Nếu đang dev (localhost), dùng port 10000 như cũ
-export const API_ORIGIN = import.meta.env.PROD
-  ? "https://cicd-cnpm-1.onrender.com"
-  : "http://localhost:10000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
 
 const sellerApi = axios.create({
-  baseURL: `${API_ORIGIN}/api`,
+  baseURL: API_URL,
   timeout: 15000,
 });
 
@@ -28,7 +24,7 @@ sellerApi.interceptors.response.use(
     if (error.response) {
       console.error("❌ SellerAPI Error Details:", {
         status: error.response.status,
-        url: error.config?.url,
+        url: error.config.url,
         data: error.response.data,
         headers: error.response.headers,
       });
@@ -39,10 +35,9 @@ sellerApi.interceptors.response.use(
   }
 );
 
-// 🟢 Sử dụng baseURL chuẩn để gọi API (đã có /api)
 export const getSellerStats = async () => {
   try {
-    const response = await sellerApi.get('/orders/seller/stats');
+    const response = await sellerApi.get('/api/orders/seller/stats');
     return response.data;
   } catch (error) {
     console.error('Error fetching seller stats:', error);

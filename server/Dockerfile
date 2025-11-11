@@ -1,23 +1,34 @@
-# Stage 1: build client
+# -------- Stage 1: BUILD CLIENT (Vite) --------
 FROM node:20 AS clientbuilder
 WORKDIR /app/client
+
 COPY client/package*.json ./
 RUN npm ci
 COPY client ./
-RUN node node_modules/vite/bin/vite.js build
-
-# Stage 2: install server deps
+RUN sed -i 's/\r$//' node_modules/vite/bin/vite.js || true \
+ && sed -i 's/\r$//' node_modules/.bin/vite || true \
+ && node node_modules/vite/bin/vite.js build
+# -------- Stage 2: Install SERVER deps (prod) --------
 FROM node:20 AS serverdeps
 WORKDIR /app/server
+
+# Cài deps theo lockfile (đÃ đổi bcrypt -> bcryptjs trong package.json)
 COPY server/package*.json ./
 RUN npm ci --omit=dev
+
+# Copy mã nguồn server (node_modules đã bị .dockerignore chặn, tốt)
 COPY server ./
 
-# Stage 3: runtime
+# ❌ BỎ HOÀN TOÀN dòng ép cài bcrypt native
+# RUN rm -rf node_modules/bcrypt && npm install bcrypt --build-from-source
+
+# -------- Stage 3: Runtime --------
 FROM node:20
 ENV NODE_ENV=production
 WORKDIR /app/server
+
 COPY --from=serverdeps /app/server /app/server
 COPY --from=clientbuilder /app/client/dist /app/server/public
+
 EXPOSE 10000
 CMD ["node", "index.js"]

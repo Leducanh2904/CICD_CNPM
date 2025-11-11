@@ -8,15 +8,23 @@ const unknownEndpoint = require("./middleware/unKnownEndpoint");
 const app = express();
 
 // CORS cho local dev
-const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
+const isProd = process.env.NODE_ENV === "production";
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://cicd-cnpm-1.onrender.com", // thêm domain Render
+];
+
 app.use(cors({
-  origin(origin, cb) {
+  origin: isProd ? true : function(origin, cb) {
     if (!origin) return cb(null, true);
     if (allowedOrigins.includes(origin)) return cb(null, true);
     return cb(new Error("Not allowed by CORS"));
   },
   credentials: true,
 }));
+app.options("*", cors());
+
 
 app.use(express.json());
 

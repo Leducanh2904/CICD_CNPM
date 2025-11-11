@@ -7,7 +7,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^9.2.1"
   },
   "scripts": {
     "start": "node server",

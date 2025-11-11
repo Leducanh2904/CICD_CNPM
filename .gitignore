@@ -13,3 +13,4 @@ dist
 .terraform
 .terraform.lock.hcl
 db
+Dockerfile.dev

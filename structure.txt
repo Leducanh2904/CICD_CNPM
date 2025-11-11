@@ -1,6 +1,17 @@
 ﻿|-- .github
+|   |-- ISSUE_TEMPLATE
+|   |   |-- bug_report.md
+|   |   |-- custom.md
+|   |   |-- feature_request.md
+|   |-- workflows
+|   |   |-- cicd.yml
+|   |   |-- monitor.yml
+|   |   |-- test.yml
 |   |-- dependabot.yml
 |-- client
+|   |-- .vite
+|   |   |-- deps_temp_6c97dac3
+|   |   |   |-- package.json
 |   |-- public
 |   |   |-- android-chrome-192x192.png
 |   |   |-- android-chrome-512x512.png
@@ -170,6 +181,10 @@
 |   |   |-- terraform-stage.tfvars
 |   |   |-- Terraform.tf
 |   |   |-- variables.tf
+|-- monitoring
+|   |-- loki-config.yml
+|   |-- prometheus.yml
+|   |-- promtail-config.yml
 |-- server
 |   |-- config
 |   |   |-- index.js
@@ -237,6 +252,13 @@
 |   |   |-- hashPassword.js
 |   |   |-- test_helper.js
 |   |   |-- validateUser.js
+|   |-- jest
+|   |   |-- .it-env.json
+|   |   |-- env.setup.js
+|   |   |-- globalSetup.js
+|   |   |-- globalTeardown.js
+|   |   |-- init.sql
+|   |   |-- test-db.js
 |   |-- middleware
 |   |   |-- unKnownEndpoint.js
 |   |   |-- verifyAdmin.js
@@ -244,9 +266,6 @@
 |   |   |-- verifyToken.js
 |   |-- public
 |   |   |-- images
-|   |   |   |-- 1761991638853-by2di-TES.avif
-|   |   |   |-- 1761991856421-1pvsv9-RHTurnAround.png
-|   |   |   |-- 1762085409977-ysn585-tesla-model-3-thumb.png
 |   |   |   |-- banhmi.jpg
 |   |   |   |-- comtam.jpg
 |   |   |   |-- pho.jpg
@@ -278,6 +297,29 @@
 |   |   |   |-- auth.test.js
 |   |   |   |-- product.test.js
 |   |   |   |-- user.test.js
+|   |   |-- integration
+|   |   |   |-- helpers
+|   |   |   |   |-- testUtils.js
+|   |   |   |-- mocks
+|   |   |   |   |-- mail.service.js
+|   |   |   |-- auth.int.test.js
+|   |   |   |-- cart.int.test.js
+|   |   |   |-- order.int.test.js
+|   |   |   |-- products.int.test.js
+|   |   |-- unit
+|   |   |   |-- helper
+|   |   |   |   |-- hashPassword.test.js
+|   |   |   |   |-- validateUser.test.js
+|   |   |   |-- middleware
+|   |   |   |   |-- verifyAdmin.test.js
+|   |   |   |   |-- verifySeller.test.js
+|   |   |   |   |-- verifyToken.test.js
+|   |   |   |-- service
+|   |   |   |   |-- cart.service.test.js
+|   |   |   |   |-- order.service.test.js
+|   |   |   |   |-- payment.service.test.js
+|   |   |   |   |-- product.service.test.js
+|   |   |   |   |-- user.service.test.js
 |   |-- .dockerignore
 |   |-- .env
 |   |-- .eslintrc.js
@@ -287,13 +329,17 @@
 |   |-- Dockerfile
 |   |-- Dockerfile.dev
 |   |-- index.js
+|   |-- otel.js
 |   |-- package-lock.json
 |   |-- package.json
 |   |-- Procfile
 |   |-- swagger.json
+|-- .env.test
 |-- .gitignore
+|-- docker
 |-- docker-compose.dev.yml
 |-- docker-compose.yml
+|-- jest.config.js
 |-- package-lock.json
 |-- package.json
 |-- README.md

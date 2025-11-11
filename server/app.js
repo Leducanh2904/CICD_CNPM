@@ -11,6 +11,7 @@ const app = express();
 const isProd = process.env.NODE_ENV === "production";
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5000",
   "http://localhost:3000",
   "https://cicd-cnpm-1.onrender.com", // thêm domain Render
 ];

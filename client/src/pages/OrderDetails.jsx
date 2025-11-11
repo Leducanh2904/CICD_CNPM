@@ -14,7 +14,17 @@ const OrderDetails = () => {
   const [error, setError] = useState(null);
 
   // Base URL cho images từ backend
-  const BASE_IMAGE_URL = 'http://localhost:10000';
+  const getBackendBase = () => {
+    if (import.meta.env.PROD) {
+      const env = import.meta.env.VITE_API_URL || '';
+      if (env) return env.replace(/\/api\/?$/, '').replace(/\/$/, '');
+      if (typeof window !== 'undefined') return window.location.origin;
+      return '';
+    }
+    return 'http://localhost:10000';
+  };
+
+  const BASE_IMAGE_URL = getBackendBase();
 
   useEffect(() => {
     const fetchOrder = async () => {

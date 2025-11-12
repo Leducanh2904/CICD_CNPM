@@ -28,6 +28,6 @@
     "jest": "^30.2.0",
     "pg": "^8.16.3",
     "supertest": "^7.1.4",
-    "testcontainers": "^11.7.2"
+    "testcontainers": "^11.8.1"
   }
 }

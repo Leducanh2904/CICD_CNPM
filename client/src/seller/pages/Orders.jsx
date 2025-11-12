@@ -16,7 +16,7 @@ export default function SellerOrders() {
   useEffect(() => {
     const fetchStore = async () => {
       try {
-        const res = await sellerApi.get("/api/stores/my");
+        const res = await sellerApi.get("/stores/my");
         const storeData = res.data.data || res.data; // ✅ Handle wrap or direct
         setStoreId(storeData.id);
       } catch (err) {
@@ -34,7 +34,7 @@ export default function SellerOrders() {
     setLoading(true);
     setCurrentPage(page);
     try {
-      const res = await sellerApi.get(`/api/orders/seller/my?page=${page}`);
+      const res = await sellerApi.get(`/orders/seller/my?page=${page}`);
       const data = res.data?.items ?? res.data;
       setOrders(Array.isArray(data) ? data : []);
       setTotalPages(res.data?.totalPages || Math.ceil((res.data?.total || 0) / 10)); // ✅ Fix pagination
@@ -54,7 +54,7 @@ export default function SellerOrders() {
 const fetchOrderDetails = async (orderId) => {
     setOrderDetailsLoading(true);
     try {
-      const res = await sellerApi.get(`/api/orders/${orderId}`);
+      const res = await sellerApi.get(`/orders/${orderId}`);
       setSelectedOrder(res.data);
     } catch (err) {
       console.error("Load order details error:", err?.response?.data || err);

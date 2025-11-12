@@ -16,7 +16,7 @@ export default function SellerMenu() {
   useEffect(() => {
     const fetchStore = async () => {
       try {
-        const res = await sellerApi.get("/api/stores/my");
+        const res = await sellerApi.get("/stores/my");
         const storeData = res.data.data || res.data;  // ✅ Handle wrap
         setStoreId(storeData.id);
       } catch (err) {
@@ -37,7 +37,7 @@ export default function SellerMenu() {
     setLoading(true);
     setCurrentPage(page);
     try {
-      const res = await sellerApi.get(`/api/products/stores/${storeId}/products?page=${page}`);
+      const res = await sellerApi.get(`/products/stores/${storeId}/products?page=${page}`);
       const data = res.data?.data ?? res.data;
       setMenuItems(Array.isArray(data) ? data : (data.products || data.data || []));
       setTotalPages(res.data?.totalPages || Math.ceil((res.data?.totalItems || 0) / 12));
@@ -62,7 +62,7 @@ export default function SellerMenu() {
   const onDelete = async (item) => {
     if (!confirm(`Delete item "${item.name}"?`)) return;
     try {
-      await sellerApi.delete(`/api/products/${item.slug}`);
+      await sellerApi.delete(`/products/${item.slug}`);
       load(currentPage);  // ✅ Refetch after delete
     } catch (err) {
       console.error("Delete error:", err?.response || err);

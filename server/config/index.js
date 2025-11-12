@@ -1,7 +1,5 @@
 require('dotenv').config();
 const { Pool } = require('pg');
-const dns = require('dns');
-
 const isProd = process.env.NODE_ENV === 'production';
 
 // Ưu tiên DATABASE_URL (Supabase cung cấp), fallback về các biến rời
@@ -22,8 +20,6 @@ const pool = new Pool({
   keepAlive: true,
   connectionTimeoutMillis: 10000,
   idleTimeoutMillis: 30000,
-  // ép DNS lookup trả về IPv4
-  lookup: (host, _opts, cb) => dns.lookup(host, { family: 4, all: false }, cb),
 });
 
 module.exports = pool;

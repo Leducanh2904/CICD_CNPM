@@ -49,7 +49,7 @@ function Dashboard() {
         console.log('🔍 Sending store_id param:', storeIdStr);
       }
       const queryString = params.toString() ? `?${params.toString()}` : '';
-      console.log('🔍 Full query for stats:', `/api/order/admin/stats${queryString}`);  // ✅ FIX: /api/order số ít
+      console.log('🔍 Full query for stats:', `/order/admin/stats${queryString}`);  // ✅ FIX: /order số ít
       const data = await getAdminStats(queryString);
       console.log('🔍 Revenue stats response:', data.revenueStats.length, 'items:', data.revenueStats.map(r => ({month: r.month, revenue: r.revenue})));  // Debug full data
       setStats(data);

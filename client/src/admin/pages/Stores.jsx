@@ -14,7 +14,7 @@ export default function AdminStores() {
     setLoading(true);
     setCurrentPage(page);
     try {
-      const res = await adminApi.get(`/api/stores?page=${page}`);
+      const res = await adminApi.get(`/stores?page=${page}`);
       const data = res.data?.data ?? res.data;
       setStores(Array.isArray(data) ? data : (data.stores || data.data || []));
       setTotalPages(res.data?.totalPages || Math.ceil((data?.length || 0) / 10));
@@ -37,8 +37,8 @@ export default function AdminStores() {
   const onDelete = async (s) => {
     if (!confirm(`Delete store "${s.name}"?`)) return;
     try {
-      // Fix: Add /api prefix to match backend routes
-      await adminApi.delete(`/api/stores/${s.id}`);
+      // Fix: Add  prefix to match backend routes
+      await adminApi.delete(`/stores/${s.id}`);
       load(currentPage);
     } catch (err) {
       console.error("Delete error:", err?.response || err);

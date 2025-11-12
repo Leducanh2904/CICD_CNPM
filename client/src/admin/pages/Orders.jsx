@@ -12,7 +12,7 @@ export default function AdminOrders() {
     setLoading(true);
     setCurrentPage(page);
     try {
-      const res = await adminApi.get(`/api/orders/admin/all?page=${page}`);
+      const res = await adminApi.get(`/orders/admin/all?page=${page}`);
       const data = res.data?.items ?? res.data;
       setOrders(Array.isArray(data) ? data : []);
       setTotalPages(res.data?.totalPages || Math.ceil((res.data?.total || 0) / 10));

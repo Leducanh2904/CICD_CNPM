@@ -50,9 +50,9 @@ const submit = async (e) => {
 
     let res;
     if (initial && initial.id) {
-      res = await sellerApi.put(`/api/products/${initial.slug}`, fd, config);  // ✅ Thêm config
+      res = await sellerApi.put(`/products/${initial.slug}`, fd, config);  // ✅ Thêm config
     } else {
-      res = await sellerApi.post("/api/products", fd, config);  // ✅ Thêm config
+      res = await sellerApi.post("/products", fd, config);  // ✅ Thêm config
     }
 
     onSaved && onSaved(res.data);

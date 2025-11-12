@@ -10,7 +10,7 @@ export default function OrderAction({ order, onUpdated }) {
 
     setLoading(true);
     try {
-      const res = await sellerApi.patch(`/api/orders/${order.ref}/status`, { status: newStatus });
+      const res = await sellerApi.patch(`/orders/${order.ref}/status`, { status: newStatus });
       if (res.status === 200) {
         onUpdated && onUpdated(res.data); // Update with real full order
       } else {

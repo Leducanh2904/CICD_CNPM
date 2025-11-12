@@ -1,9 +1,10 @@
 import axios from "axios";
 import { normalizeToken } from "helpers/token";
-const baseURL = import.meta.env.PROD
-  ? import.meta.env.VITE_API_URL
-  : "http://localhost:10000/api";
-
+// const baseURL = import.meta.env.PROD
+//   ? import.meta.env.VITE_API_URL
+//   : "http://localhost:10000/api";
+const RAW = import.meta.env.VITE_API_URL || "http://localhost:10000";
+const baseURL = `${RAW.replace(/\/+$/, "")}/api`;
 const API = axios.create({
   baseURL,
   withCredentials: true,

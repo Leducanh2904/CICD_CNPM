@@ -1,8 +1,4 @@
-/**
- * verifySeller middleware tests
- * - Implementation calls next(err) on failures (Unauthorized / Access denied)
- * - Success: next() without error
- */
+
 const verifySeller = require("../../../middleware/verifySeller");
 
 const res = {};

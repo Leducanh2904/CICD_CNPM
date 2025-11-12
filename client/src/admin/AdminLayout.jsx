@@ -8,14 +8,19 @@ const handleLogout = () => {
   console.log("Logout clicked");
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  localStorage.clear(); 
+  localStorage.clear();
   document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  
+
+  // ✅ Sửa chỗ này — không hardcode localhost
+  const LOGIN_PATH = import.meta.env.VITE_LOGIN_PATH ?? "/login";
+
   setTimeout(() => {
-  window.location.href = "http://localhost:5173/login";
-  }, 100 );
+    // Dùng navigate nếu chỉ chuyển trang trong app SPA
+    navigate(LOGIN_PATH, { replace: true });
+  }, 100);
 };
+
 
   return (
     <div className="flex min-h-screen">

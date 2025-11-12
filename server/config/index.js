@@ -1,17 +1,29 @@
-require("dotenv").config();
-const { Pool } = require("pg");
+require('dotenv').config();
+const { Pool } = require('pg');
+const dns = require('dns');
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProd = process.env.NODE_ENV === 'production';
+
+// Ưu tiên DATABASE_URL (Supabase cung cấp), fallback về các biến rời
 const database =
-  process.env.NODE_ENV === "test"
+  process.env.NODE_ENV === 'test'
     ? process.env.POSTGRES_DB_TEST
     : process.env.POSTGRES_DB;
 
-const connectionString = `postgresql://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT}/${database}`;
+const connectionString =
+  process.env.DATABASE_URL ||
+  `postgresql://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}` +
+  `@${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT}/${database}`;
+
+// Pool với IPv4 + SSL cho Supabase/Render
 const pool = new Pool({
   connectionString,
-  ssl: isProduction ? { rejectUnauthorized: false } : false,
+  ssl: isProd ? { rejectUnauthorized: false } : false, // Supabase cần SSL trong prod
+  keepAlive: true,
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  // ép DNS lookup trả về IPv4
+  lookup: (host, _opts, cb) => dns.lookup(host, { family: 4, all: false }, cb),
 });
 
-// Export pool trực tiếp để có connect(), query(), end()
 module.exports = pool;

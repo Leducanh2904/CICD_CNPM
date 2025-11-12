@@ -2,7 +2,7 @@ import { Card, Pagination } from "@windmill/react-ui";
 import Spinner from "components/Spinner";
 import { useStore } from "context/StoreContext"; 
 import Layout from "layout/Layout";
-import { useEffect, useState } from "react";  // ✅ Add useEffect/useState
+import { useEffect, useState } from "react";  
 import { useNavigate } from "react-router-dom";
 
 const StoreList = () => {
@@ -11,14 +11,14 @@ const StoreList = () => {
   const [filteredStores, setFilteredStores] = useState([]);  // ✅ State cho kết quả lọc
   const navigate = useNavigate();
 
-  // ✅ New: Lọc stores theo tên khi searchTerm thay đổi
+  
   useEffect(() => {
-    if (stores && searchTerm) {
+    if (Array.isArray(stores) && searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
       const filtered = stores.filter(store => store.name.toLowerCase().includes(lowerTerm));
       setFilteredStores(filtered);
     } else {
-      setFilteredStores(stores || []);
+     setFilteredStores(Array.isArray(stores) ? stores : []);
     }
   }, [searchTerm, stores]);
 
@@ -50,7 +50,7 @@ const StoreList = () => {
           />
         </div>
         <Card className="flex flex-wrap h-full mx-2">
-          {filteredStores?.map((store) => (  // ✅ Sử dụng filteredStores
+          {Array.isArray(filteredStores) && filteredStores.map((store) => (  
             <div
               className="w-full flex flex-col justify-between sm:w-1/2 md:w-1/3 lg:w-1/4 my-2 px-2 box-border"
               key={store.id}

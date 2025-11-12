@@ -1,4 +1,5 @@
 // server/app.js
+require('express-async-errors');
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
@@ -62,3 +63,11 @@ app.get("*", (req, res, next) => {
 app.use(unknownEndpoint);
 
 module.exports = app;
+app.use((err, req, res, next) => {
+   console.error('🔥 Error:', err);
+   const status =
+     Number.isInteger(err?.statusCode) ? err.statusCode :
+     Number.isInteger(err?.status)     ? err.status     :
+     500;
+   res.status(status).json({ message: err?.message || 'Server error' });
+ });

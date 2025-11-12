@@ -1,4 +1,3 @@
-import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Windmill } from "@windmill/react-ui";
 import { GlobalHistory } from "components/GlobalHistory";
 import { CartProvider } from "context/CartContext";
@@ -15,10 +14,9 @@ import "./index.css";
 const container = document.getElementById("root");
 const root = createRoot(container);
 
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 root.render(
-  <GoogleOAuthProvider clientId={googleClientId}>
+  
     <HelmetProvider>
       <Windmill>
         <UserProvider>
@@ -37,5 +35,4 @@ root.render(
         </UserProvider>
       </Windmill>
     </HelmetProvider>
-  </GoogleOAuthProvider>
 );

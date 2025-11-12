@@ -21,7 +21,7 @@
     "test:all": "npm run test:unit && npm run test:integration"
   },
   "devDependencies": {
-    "@testcontainers/postgresql": "^11.7.2",
+    "@testcontainers/postgresql": "^11.8.1",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",

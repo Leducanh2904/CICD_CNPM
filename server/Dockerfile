@@ -8,15 +8,11 @@ COPY client ./
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL}
 ENV NODE_ENV=production
-# (optional) in case CRLF on Windows
-RUN sed -i 's/\r$//' node_modules/vite/bin/vite.js || true \
- && sed -i 's/\r$//' node_modules/.bin/vite || true
-
 # In ra để kiểm tra trong build logs
 RUN echo ">>> VITE_API_URL=$VITE_API_URL"
-
-# Build FE (nên dùng script thay vì gọi vite trực tiếp)
-RUN npm run build
+RUN sed -i 's/\r$//' node_modules/vite/bin/vite.js || true \
+ && sed -i 's/\r$//' node_modules/.bin/vite || true \
+ && node node_modules/vite/bin/vite.js build
 # -------- Stage 2: Install SERVER deps (prod) --------
 FROM node:20 AS serverdeps
 WORKDIR /app/server

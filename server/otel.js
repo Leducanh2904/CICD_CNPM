@@ -1,4 +1,6 @@
 // server/otel.js
+'use strict';
+
 const { NodeSDK } = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
@@ -8,20 +10,20 @@ const { PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const endpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 const headersString = process.env.OTEL_EXPORTER_OTLP_HEADERS || "";
 
-// Parse "Authorization=Basic xxxxx" -> { Authorization: "Basic xxxxx" }
+// Parse "Authorization=Basic xxx" -> { Authorization: 'Basic xxx' }
 const headers = {};
 headersString.split(",").forEach((h) => {
   const [k, v] = h.split("=");
   if (k && v) headers[k.trim()] = v.trim();
 });
 
-// Exporter traces
+// exporter cho traces
 const traceExporter = new OTLPTraceExporter({
   url: `${endpoint}/v1/traces`,
   headers,
 });
 
-// Exporter metrics
+// exporter cho metrics
 const metricExporter = new OTLPMetricExporter({
   url: `${endpoint}/v1/metrics`,
   headers,
@@ -37,20 +39,20 @@ const sdk = new NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()],
 });
 
-// start sync – không dùng .then()
+// start (sync, không .then)
 try {
   sdk.start();
-  console.log("OpenTelemetry SDK started");
+  console.log('OpenTelemetry SDK started');
 } catch (err) {
-  console.error("Error starting OpenTelemetry SDK", err);
+  console.error('Error starting OpenTelemetry SDK', err);
 }
 
-process.on("SIGTERM", async () => {
+process.on('SIGTERM', async () => {
   try {
     await sdk.shutdown();
-    console.log("OpenTelemetry SDK shut down");
+    console.log('OpenTelemetry SDK shut down');
   } catch (err) {
-    console.error("Error shutting down OpenTelemetry SDK", err);
+    console.error('Error shutting down OpenTelemetry SDK', err);
   } finally {
     process.exit(0);
   }

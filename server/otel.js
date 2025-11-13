@@ -10,6 +10,9 @@ const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http')
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 const { PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 
+// 🆕 thêm để dùng Meter (metrics API)
+const { metrics } = require('@opentelemetry/api');
+
 const endpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 const headersString = process.env.OTEL_EXPORTER_OTLP_HEADERS || "";
 
@@ -46,6 +49,25 @@ const sdk = new NodeSDK({
 try {
   sdk.start();
   console.log('OpenTelemetry SDK started');
+
+  // 🆕======= PHẦN THÊM METRICS DEMO =========
+  // Lấy meter từ global provider mà NodeSDK đã đăng ký
+  const meter = metrics.getMeter('foodfast-meter');
+
+  // Tạo 1 counter test để chắc chắn có metric trong Grafana
+  // Tên metric: foodfast_signup_requests_total
+  const signupCounter = meter.createCounter('foodfast_signup_requests_total', {
+    description: 'Number of signup requests (test metric)',
+  });
+
+  // Cứ 10 giây tăng counter 1 lần (để Grafana có dữ liệu)
+  setInterval(() => {
+    signupCounter.add(1, { env: process.env.NODE_ENV || 'local' });
+  }, 10000);
+
+  console.log('Metrics demo (foodfast_signup_requests_total) initialized');
+  // =========================================
+
 } catch (err) {
   console.error('Error starting OpenTelemetry SDK', err);
 }

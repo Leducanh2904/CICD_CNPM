@@ -8,7 +8,7 @@ const getAllUsersDb = async () => {
 const createUserDb = async ({ username, password, email, fullname, roles = 'user', phone }) => {  // ✅ THÊM phone param
   const { rows: user } = await pool.query(
     `INSERT INTO users(username, password, email, fullname, roles, phone) 
-    VALUES($1, $2, $3, $3, $4, $5, $6) 
+    VALUES($1, $2, $3, $4, $5, $6) 
     RETURNING user_id, username, email, fullname, roles, phone, address, city, state, country, created_at`,
     [username, password, email, fullname, roles, phone || null]  // ✅ THÊM phone
   );

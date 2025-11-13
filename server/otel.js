@@ -1,4 +1,7 @@
 // server/otel.js
+console.log("ENDPOINT:", process.env.OTEL_EXPORTER_OTLP_ENDPOINT);
+console.log("HEADERS RAW:", process.env.OTEL_EXPORTER_OTLP_HEADERS);
+
 'use strict';
 
 const { NodeSDK } = require('@opentelemetry/sdk-node');

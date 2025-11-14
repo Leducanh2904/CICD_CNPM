@@ -44,14 +44,3 @@ jobs:
 
           echo "✅ Website OK"
 
-      - name: Ghi log ra GitHub Issues (tùy chọn)
-        if: failure() && github.event_name != 'pull_request'
-        uses: dacbd/create-issue-action@v1
-        with:
-          token: ${{ github.token }}
-          title: "⚠️ Health check FAILED"
-          body: |
-            URL: ${{ env.TARGET_URL }}
-            Status: ${{ steps.check.outputs.status }}
-            Latency: ${{ steps.check.outputs.latency_ms }}ms
-            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

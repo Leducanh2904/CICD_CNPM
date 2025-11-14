@@ -33,8 +33,7 @@ describe("CartService.getCartCount", () => {
     const c = await CartService.getCartCount(1);
     expect(c).toBe(5);
   });
-});
-
+});//â
 // test("INTENTIONAL FAIL: createOrder must call DB exactly twice", async () => {
 //   db.createOrderDb.mockResolvedValue({ id: 1 });
 //   await OrderService.createOrder({

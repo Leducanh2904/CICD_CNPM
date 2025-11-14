@@ -33,13 +33,13 @@ describe("CartService.getCartCount", () => {
     const c = await CartService.getCartCount(1);
     expect(c).toBe(5);
   });
-});//â
-// test("INTENTIONAL FAIL: createOrder must call DB exactly twice", async () => {
-//   db.createOrderDb.mockResolvedValue({ id: 1 });
-//   await OrderService.createOrder({
-//     userId: 4, amount: 1, itemTotal: 1, paymentMethod: "qr",
-//     ref: "X", addressData: { shipping_address_id: 1 },
-//   });
-//   // Expect sai (thực tế chỉ gọi 1 lần) -> sẽ fail
-//   expect(db.createOrderDb).toHaveBeenCalledTimes(2);
-// });
+});
+test("INTENTIONAL FAIL: createOrder must call DB exactly twice", async () => {
+  db.createOrderDb.mockResolvedValue({ id: 1 });
+  await OrderService.createOrder({
+    userId: 4, amount: 1, itemTotal: 1, paymentMethod: "qr",
+    ref: "X", addressData: { shipping_address_id: 1 },
+  });
+  // Expect sai (thực tế chỉ gọi 1 lần) -> sẽ fail
+  expect(db.createOrderDb).toHaveBeenCalledTimes(2);
+});

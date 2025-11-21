@@ -21,9 +21,9 @@ services:
     container_name: pern-store-server
     restart: unless-stopped
     environment:
-    NODE_ENV: development
-    PORT: 10000
-    DATABASE_URL: postgres://postgres:newpassword@database:5432/pernstore
+      NODE_ENV: development
+      PORT: 10000
+      DATABASE_URL: postgres://postgres:newpassword@database:5432/pernstore
     volumes:
       - ./server:/app
       - /app/node_modules

@@ -25,7 +25,7 @@
     "@testcontainers/postgresql": "^11.7.2",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.3",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.3.1",
     "jest": "^30.2.0",
     "pg": "^8.16.3",
     "supertest": "^7.1.4",
